@@ -1,5 +1,6 @@
 package folk.tradingbot.telegram;
 
+import folk.tradingbot.CashFlowTrader;
 import folk.tradingbot.Utils;
 import folk.tradingbot.telegram.configs.TDLibLogger;
 import folk.tradingbot.telegram.configs.TelegramConfigs;
@@ -55,5 +56,11 @@ public class TelegramClientAutoConfiguration {
     @Bean
     public TelegramConfigs telegramConfigs() {
         return new TelegramConfigs();
+    }
+
+    //todo перенести в отдельный конфиг
+    @Bean
+    public CashFlowTrader cashFlowTrader() {
+        return new CashFlowTrader();
     }
 }
