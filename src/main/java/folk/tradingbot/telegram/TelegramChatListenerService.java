@@ -1,5 +1,6 @@
 package folk.tradingbot.telegram;
 
+import folk.tradingbot.CashFlowTrader;
 import folk.tradingbot.telegram.configs.TelegramConfigs;
 import folk.tradingbot.telegram.models.TelegramChat;
 import folk.tradingbot.telegram.models.TelegramUpdateMessage;
@@ -22,6 +23,8 @@ public class TelegramChatListenerService {
     private TelegramConfigs telegramConfigs;
     @Autowired
     private TelegramClient telegramClient;
+    @Autowired
+    private CashFlowTrader cashFlowTrader;
 
     @Getter
     @Setter
@@ -46,5 +49,13 @@ public class TelegramChatListenerService {
             return;
         String messageContent = updateMessage.getMessageContent();
         telegramClient.sendMessage(346L, messageContent);
+
+        cashFlowTrader.cashFlow(messageContent);
+        System.out.println("Инвистиционные идеи:");
+        cashFlowTrader.traderIdeaRepo.getAllTraderIdeas().forEach(System.out::println);
+        System.out.println("\n");
+        System.out.println("Трейдер позиции:");
+        cashFlowTrader.traderPositionRepo.getAllTraderPosition().forEach(System.out::println);
+        System.out.println("\n");
     }
 }

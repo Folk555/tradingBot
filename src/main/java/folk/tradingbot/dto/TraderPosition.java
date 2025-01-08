@@ -1,12 +1,10 @@
 package folk.tradingbot.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 @AllArgsConstructor
+@ToString
 public class TraderPosition {
     @NonNull
     @Getter @Setter

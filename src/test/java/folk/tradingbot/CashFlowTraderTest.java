@@ -62,9 +62,9 @@ class CashFlowTraderTest {
         CashFlowTrader cashFlowTrader = new CashFlowTrader();
         cashFlowTrader.cashFlow(message);
 
-        Assertions.assertFalse(cashFlowTrader.traderIdeaRepo.getAllTraderIdeas().isEmpty());
+        Assertions.assertFalse(cashFlowTrader.traderPositionRepo.getAllTraderPosition().isEmpty());
 
-        System.out.println(cashFlowTrader.traderIdeaRepo.getAllTraderIdeas());
+        cashFlowTrader.traderPositionRepo.getAllTraderPosition().forEach(System.out::println);
     }
 
     @Test
