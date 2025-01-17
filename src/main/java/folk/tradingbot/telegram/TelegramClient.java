@@ -1,6 +1,5 @@
 package folk.tradingbot.telegram;
 
-import folk.tradingbot.Utils;
 import folk.tradingbot.telegram.handlers.TelegramResultHandler;
 import folk.tradingbot.telegram.handlers.TelegramResultObjectHandler;
 import folk.tradingbot.telegram.handlers.TelegramUpdateHandler;
@@ -9,12 +8,13 @@ import folk.tradingbot.telegram.models.TelegramChat;
 import folk.tradingbot.telegram.models.TelegramUser;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,16 +23,20 @@ import java.util.concurrent.locks.ReentrantLock;
  * Обертка над оригинальным телеграмм клиентом TDLib
  * клиент для работы с телеграммом
  */
+@PropertySource("file:application.properties")
 public class TelegramClient {
 
     private final TelegramUpdateHandler updateHandler;
     private final Client client;
     private ArrayList<TelegramChat> chatList = new ArrayList<>();
     private TelegramUser myUser;
+    @Value("${telegram.selfChatId}")
+    private Long selfChat;
 
     /**
      * Не используй этот конструктор, он нужен для юнит тестов
      */
+    @Deprecated
     public TelegramClient(TelegramUpdateHandler updateHandler, Client client) {
         this.updateHandler = updateHandler;
         this.client = client != null ? client : Client.create(updateHandler, null, null);
@@ -90,12 +94,41 @@ public class TelegramClient {
         }
     }
 
-    public void sendMessage(Long targetChatId, String msg) {
+    public void sendMessageToChat(Long targetChatId, String msg) {
         TdApi.FormattedText text = new TdApi.FormattedText(msg, null);
         TdApi.InputMessageContent content = new TdApi.InputMessageText(text, null, true);
-        TdApi.SendMessage query = new TdApi.SendMessage(458696774, 0, null,
+        TdApi.SendMessage query = new TdApi.SendMessage(targetChatId, 0, null,
                 null, null, content);
         client.send(query, null);
+    }
+
+    public void sendMessageToMainChat(String msg) {
+        TdApi.FormattedText text = new TdApi.FormattedText(msg, null);
+        TdApi.InputMessageContent content = new TdApi.InputMessageText(text, null, true);
+        TdApi.SendMessage query = new TdApi.SendMessage(selfChat, 0, null,
+                null, null, content);
+        client.send(query, null);
+    }
+
+    public String[] getLastMessagesTxtFromChat(Long chatId, int messagesCount) {
+        TdApi.GetChatHistory tdApiFun = new TdApi.GetChatHistory(chatId, 0, 0, messagesCount, false);
+        TdApi.Messages lastMessages = sendAndWaitAns(tdApiFun, new TdApi.Messages());
+
+        System.out.println("\n\n\n\n");
+        String[] txtArray = Arrays.stream(lastMessages.messages)
+                .filter(message -> message.content.getConstructor() == TdApi.MessagePhoto.CONSTRUCTOR)
+                .map(message -> {
+                    return ((TdApi.MessagePhoto)message.content).caption.text;
+                })
+                .toArray(String[]::new);
+        return txtArray;
+    }
+
+    public String getMessageById(Long chatId, Long id) {
+        TdApi.GetChatHistory tdApiFun = new TdApi.GetChatHistory(chatId, id, -1, 1, false);
+        TdApi.Messages responseTdapiObject = sendAndWaitAns(tdApiFun, new TdApi.Messages());
+
+        return ((TdApi.MessagePhoto) responseTdapiObject.messages[0].content).caption.text;
     }
 
 }

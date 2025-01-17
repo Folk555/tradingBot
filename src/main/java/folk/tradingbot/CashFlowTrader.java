@@ -34,8 +34,7 @@ public class CashFlowTrader {
                 || (message.contains("Друзья! На Ютуб канале"))
                 || (message.contains("вступай в Premium"))) {
         } else {
-            telegramClient.sendMessage(346L,
-                    "Неожиданное сообщение в CASHFLOW\n\n" + message);
+            telegramClient.sendMessageToMainChat("Неожиданное сообщение в CASHFLOW\n\n" + message);
         }
     }
 
@@ -59,10 +58,10 @@ public class CashFlowTrader {
     private void openPosition(String message) {
         String name = Utils.findGroupFromRegax(message, "(.*)ПОКУПКА LONG!\n(\\W+)\n(.*)", 2);
         String ticker = "#" + Utils.findGroupFromRegax(message, "(.*?)#(\\w+)(.*)", 2);
-        Float startPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)ВХОД: (\\d+)Р(.*)", 2));
-        Float stopPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Стоп: (\\d+)P(.*)", 2));
-        Float profitPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Цель: (\\d+)Р(.*)", 2));
-        Float profitPercent = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)([0-9]+[.][0-9]+)%(.*)", 2));
+        Float startPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)ВХОД: (\\d+[.]?\\d*)(Р|P)+(.*)", 2));
+        Float stopPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Стоп: (\\d+[.]?\\d*)(Р|P)(.*)", 2));
+        Float profitPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Цель: (\\d+[.]?\\d*)(Р|P)(.*)", 2));
+        Float profitPercent = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)\\+(\\d+[.]+\\d+)%(.*)", 2));
 
         TraderPosition traderPosition = new TraderPosition((long) (traderPositionRepo.getAllTraderPosition().size() + 1),
                 name, ticker, null, startPrice, profitPrice, profitPercent, stopPrice, false,
@@ -74,21 +73,25 @@ public class CashFlowTrader {
         String ticker = "#" + Utils.findGroupFromRegax(message, "(.*)#(\\w+)(.*)", 2);
 
         TraderPosition traderPosition = traderPositionRepo.getLastOpenTraderPositionByTicker(ticker);
-        TraderPosition cloneTraderPosition = traderPositionRepo.getLastOpenTraderPositionByTicker(ticker);
-        if (cloneTraderPosition == null)
+        TraderPosition cloneTraderPosition = new TraderPosition(traderPosition);
+        if (traderPosition == null)
             return;
         traderPosition.setClosed(true);
         traderPosition.setCloseTime(LocalDateTime.now());
         traderPositionRepo.saveTraderPosition(traderPosition);
+        if (message.contains("Фиксирую финальную")) {
+            Float startPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)по (\\d+)Р(.*)", 2));
+            Float stopPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)в безубыток(.*)Р(.*)", 2));
+            LocalDateTime now = LocalDateTime.now();
 
-        Float startPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)по(.*)Р", 2));
-        Float stopPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)в безубыток(.*)P(.*)", 2));
-        LocalDateTime now = LocalDateTime.now();
-
-        cloneTraderPosition.setOpenTime(now);
-        cloneTraderPosition.setStartPrice(startPrice);
-        cloneTraderPosition.setStopPrice(stopPrice);
-        cloneTraderPosition.setId((long) traderPositionRepo.getAllTraderPosition().size());
-        traderPositionRepo.saveTraderPosition(cloneTraderPosition);
+            cloneTraderPosition.setOpenTime(now);
+            cloneTraderPosition.setStartPrice(startPrice);
+            cloneTraderPosition.setStopPrice(stopPrice);
+            cloneTraderPosition.setId((long) traderPositionRepo.getAllTraderPosition().size());
+            traderPositionRepo.saveTraderPosition(cloneTraderPosition);
+        } else {
+            //todo продаем акции так как позиция закрыта
+        }
     }
+
 }

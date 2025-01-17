@@ -26,7 +26,8 @@ public class TraderPositionImplArrayList implements TraderPositionRepo{
 
     @Override
     public TraderPosition getLastOpenTraderPositionByTicker(String ticker) {
-        return list.stream().filter(traderPosition -> !traderPosition.isClosed())
+        TraderPosition traderPosition1 = list.stream().filter(traderPosition -> !traderPosition.isClosed())
                 .filter(traderPosition -> traderPosition.getTicker().equals(ticker)).findFirst().orElse(null);
+        return traderPosition1 == null ? null : new TraderPosition(traderPosition1);
     }
 }

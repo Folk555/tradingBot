@@ -29,7 +29,8 @@ public class TelegramChatListenerService {
     @Getter
     @Setter
     private Set<String> targetChatName;
-    private Map<String, Long> chatIdByName = new HashMap<>();
+    @Getter
+    private Map<String, Long> targetChatIdByName = new HashMap<>();
 
     @PostConstruct
     private void init() {
@@ -37,18 +38,28 @@ public class TelegramChatListenerService {
         targetChatName = new HashSet<>(List.of(split));
         List<TelegramChat> mainChatList = telegramClient.getMainChatList(40);
         mainChatList.stream().filter(telegramChat -> targetChatName.contains(telegramChat.getChatName()))
-                .forEach(telegramChat -> chatIdByName.put(telegramChat.getChatName(), telegramChat.getId()));
+                .forEach(telegramChat -> targetChatIdByName.put(telegramChat.getChatName(), telegramChat.getId()));
     }
 
     public void processMessage(TelegramUpdateMessage updateMessage) {
         Long selfUserId = telegramClient.getMyUser().getUserId();
-        Long senderId = updateMessage.getMessageSenderId();
-        if (Objects.equals(selfUserId, senderId))
+        Long senderChatId = updateMessage.getMessageSenderId();
+        if (Objects.equals(selfUserId, senderChatId))
             return;
-        if (!chatIdByName.containsValue(senderId))
+        if (!targetChatIdByName.containsValue(senderChatId))
             return;
         String messageContent = updateMessage.getMessageContent();
-        telegramClient.sendMessage(346L, messageContent);
+        telegramClient.sendMessageToMainChat("Пришло сообщение\n" + messageContent);
+
+        cashFlowTrader.cashFlow(messageContent);
+        System.out.println("Трейдер позиции:");
+        cashFlowTrader.traderPositionRepo.getAllTraderPosition().forEach(System.out::println);
+        System.out.println("\n");
+    }
+
+    public void processMessageDebug(Long chatId) {
+        //telegramClient.getLastMessagesTxtFromChat(chatId);
+        String messageContent = telegramClient.getMessageById(chatId, 4540334080L);
 
         cashFlowTrader.cashFlow(messageContent);
         System.out.println("Инвистиционные идеи:");
@@ -58,4 +69,5 @@ public class TelegramChatListenerService {
         cashFlowTrader.traderPositionRepo.getAllTraderPosition().forEach(System.out::println);
         System.out.println("\n");
     }
+
 }

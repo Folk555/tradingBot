@@ -1,5 +1,6 @@
 package folk.tradingbot;
 
+import folk.tradingbot.telegram.TelegramChatListenerService;
 import folk.tradingbot.telegram.TelegramClient;
 import folk.tradingbot.telegram.TelegramClientAutoConfiguration;
 import folk.tradingbot.telegram.models.TelegramChat;
@@ -7,6 +8,7 @@ import folk.tradingbot.telegram.models.TelegramUser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
@@ -15,13 +17,11 @@ import java.util.List;
 public class TradingBotApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TradingBotApplication.class, args);
-        ApplicationContext context = new AnnotationConfigApplicationContext(TelegramClientAutoConfiguration.class);
+        ConfigurableApplicationContext context = SpringApplication.run(TradingBotApplication.class, args);
 //        TelegramClient telegramClient = context.getBean(TelegramClient.class);
-//        TelegramUser myUser = telegramClient.getMyUser();
-//        List<TelegramChat> mainChatList = telegramClient.getMainChatList(20);
-//        System.out.println("sd");
-//        System.out.println("dfhb");
+//        TelegramChatListenerService telegramChatListenerService = context.getBean(TelegramChatListenerService.class);
+//        Long сигналыОтCashflow = telegramChatListenerService.getChatIdByName().get("СИГНАЛЫ от CASHFLOW");
+//        telegramChatListenerService.processMessageDebug(сигналыОтCashflow);
     }
 
 }
