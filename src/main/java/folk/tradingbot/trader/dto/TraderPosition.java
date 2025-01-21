@@ -1,17 +1,21 @@
-package folk.tradingbot.dto;
+package folk.tradingbot.trader.dto;
 
 import lombok.*;
 
 import java.time.LocalDateTime;
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
+//@Entity
+//@Table(name = "trader_position")
 public class TraderPosition {
-    @Getter @Setter
+    @Getter @Setter //@Id
     Long id;
     String name;
     @Getter
     String ticker;
-    TraderIdea traderIdea;
+    //todo пока без этого функционала
+    //TraderIdea traderIdea;
     @Setter
     Float startPrice;
     @Setter
@@ -31,7 +35,7 @@ public class TraderPosition {
         this.id = traderPosition.id;
         this.name = traderPosition.name;
         this.ticker = traderPosition.ticker;
-        this.traderIdea = traderPosition.traderIdea;
+        //this.traderIdea = traderPosition.traderIdea;
         this.startPrice = traderPosition.startPrice;
         this.profitPrice = traderPosition.profitPrice;
         this.profitPercent = traderPosition.profitPercent;

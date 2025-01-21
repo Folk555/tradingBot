@@ -1,12 +1,13 @@
-package folk.tradingbot;
+package folk.tradingbot.trader;
 
-import folk.tradingbot.dto.TraderIdea;
-import folk.tradingbot.dto.TraderIdeaStatus;
-import folk.tradingbot.dto.TraderPosition;
-import folk.tradingbot.repository.TraderIdeaImplArrayList;
-import folk.tradingbot.repository.TraderIdeaRepo;
-import folk.tradingbot.repository.TraderPositionImplArrayList;
-import folk.tradingbot.repository.TraderPositionRepo;
+import folk.tradingbot.Utils;
+import folk.tradingbot.trader.dto.TraderIdea;
+import folk.tradingbot.trader.dto.TraderIdeaStatus;
+import folk.tradingbot.trader.dto.TraderPosition;
+import folk.tradingbot.trader.repository.TraderIdeaImplArrayList;
+import folk.tradingbot.trader.repository.TraderIdeaRepo;
+import folk.tradingbot.trader.repository.TraderPositionImplArrayList;
+import folk.tradingbot.trader.repository.TraderPositionRepo;
 import folk.tradingbot.telegram.TelegramClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,7 @@ public class CashFlowTrader {
         Float profitPercent = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)\\+(\\d+[.]+\\d+)%(.*)", 2));
 
         TraderPosition traderPosition = new TraderPosition((long) (traderPositionRepo.getAllTraderPosition().size() + 1),
-                name, ticker, null, startPrice, profitPrice, profitPercent, stopPrice, false,
+                name, ticker, startPrice, profitPrice, profitPercent, stopPrice, false,
                 LocalDateTime.now(), null);
         traderPositionRepo.saveTraderPosition(traderPosition);
     }

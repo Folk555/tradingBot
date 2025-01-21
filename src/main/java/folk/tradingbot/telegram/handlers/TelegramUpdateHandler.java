@@ -1,11 +1,11 @@
 package folk.tradingbot.telegram.handlers;
 
-import folk.tradingbot.telegram.models.OrderedChat;
+import folk.tradingbot.Utils;
 import folk.tradingbot.telegram.TelegramChatListenerService;
 import folk.tradingbot.telegram.TelegramClient;
-import folk.tradingbot.telegram.models.TelegramUpdateMessage;
 import folk.tradingbot.telegram.configs.TelegramConfigs;
-import folk.tradingbot.Utils;
+import folk.tradingbot.telegram.models.OrderedChat;
+import folk.tradingbot.telegram.models.TelegramUpdateMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.drinkless.tdlib.TdApi;
@@ -98,9 +98,12 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
                 }
                 break;
             }
-            default:
+            default: {
+                System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
+                System.out.println("Возникло исключение в методе onResult");
                 throw new RuntimeException("логика для обработки update [" + object + "] не реализована. " +
                         "Зайди в класс Example и перетени необходимую реализацию");
+            }
         }
     }
 
@@ -164,6 +167,8 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
 
     public void setTelegramClient(TelegramClient telegramClient) {
         if (this.telegramClient != null) {
+            System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
+            System.out.println("Возникло исключение в методе setTelegramClient");
             throw new RuntimeException("В 1 TelegramUpdateHandler телеграм клиент можно задать только 1 раз");
         }
         this.telegramClient = telegramClient;

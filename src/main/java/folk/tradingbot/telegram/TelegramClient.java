@@ -90,6 +90,8 @@ public class TelegramClient {
             lock.unlock();
             return resultObjectHandler.getResponseTdapiObject();
         } catch (Exception e) {
+            System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
+            System.out.println("Возникло исключение в методе sendAndWaitAns");
             throw new RuntimeException(e);
         }
     }

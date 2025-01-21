@@ -1,6 +1,5 @@
 package folk.tradingbot.telegram;
 
-import folk.tradingbot.CashFlowTrader;
 import folk.tradingbot.Utils;
 import folk.tradingbot.telegram.configs.TDLibLogger;
 import folk.tradingbot.telegram.configs.TelegramConfigs;
@@ -27,6 +26,8 @@ public class TelegramClientAutoConfiguration {
             Client.execute(new TdApi.SetLogVerbosityLevel(0));
             Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile("tdlib.log", 1 << 27, false)));
         } catch (Client.ExecutionException error) {
+            System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
+            System.out.println("Возникло исключение в static TelegramClientAutoConfiguration");
             throw new IOError(new IOException("Write access to the current directory is required"));
         }
     }
@@ -58,9 +59,4 @@ public class TelegramClientAutoConfiguration {
         return new TelegramConfigs();
     }
 
-    //todo перенести в отдельный конфиг
-    @Bean
-    public CashFlowTrader cashFlowTrader() {
-        return new CashFlowTrader();
-    }
 }

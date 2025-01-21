@@ -20,8 +20,11 @@ public class Utils {
     }
 
     public static void sleep(int seconds) {
-        if (seconds > 60)
+        if (seconds > 60) {
+            System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
+            System.out.println("Возникло исключение в методе sleep");
             throw new RuntimeException("Медот Sleep будет ждать больше минуты. Не очень хорошо");
+        }
         try {
             Thread.sleep(seconds * 1000L);
         } catch (InterruptedException e) {

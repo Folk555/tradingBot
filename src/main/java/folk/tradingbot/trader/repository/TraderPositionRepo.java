@@ -1,6 +1,6 @@
-package folk.tradingbot.repository;
+package folk.tradingbot.trader.repository;
 
-import folk.tradingbot.dto.TraderPosition;
+import folk.tradingbot.trader.dto.TraderPosition;
 
 import java.util.ArrayList;
 

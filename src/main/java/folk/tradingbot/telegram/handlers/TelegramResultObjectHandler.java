@@ -37,7 +37,11 @@ public class TelegramResultObjectHandler<T extends TdApi.Object> implements Tele
                     System.err.println("Receive wrong response from TDLib: " + object);
                 }
                 condition.signalAll();
-            } else throw new RuntimeException("Не получилось синхронизировать поток в TelegramResultObjectHandler.onResult");
+            } else {
+                System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
+                System.out.println("Возникло исключение в методе onResult");
+                throw new RuntimeException("Не получилось синхронизировать поток в TelegramResultObjectHandler.onResult");
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {

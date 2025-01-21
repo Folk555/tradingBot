@@ -1,4 +1,4 @@
-package folk.tradingbot.dto;
+package folk.tradingbot.trader.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

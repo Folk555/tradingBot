@@ -14,6 +14,8 @@ public class TelegramAuthorizationHandler implements TelegramResultHandler {
             case TdApi.Ok.CONSTRUCTOR:
                 break;
             default:
+                System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
+                System.out.println("Возникло исключение в методе onResult");
                 throw new RuntimeException("Receive wrong response from TDLib: " + object);
         }
     }

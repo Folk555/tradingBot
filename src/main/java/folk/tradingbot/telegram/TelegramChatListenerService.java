@@ -1,6 +1,6 @@
 package folk.tradingbot.telegram;
 
-import folk.tradingbot.CashFlowTrader;
+import folk.tradingbot.trader.CashFlowTrader;
 import folk.tradingbot.telegram.configs.TelegramConfigs;
 import folk.tradingbot.telegram.models.TelegramChat;
 import folk.tradingbot.telegram.models.TelegramUpdateMessage;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Обработчик новых сообщений. Подписывает его на определенный чат,
@@ -42,12 +43,20 @@ public class TelegramChatListenerService {
     }
 
     public void processMessage(TelegramUpdateMessage updateMessage) {
+        System.out.println(updateMessage.getMessage());
         Long selfUserId = telegramClient.getMyUser().getUserId();
         Long senderChatId = updateMessage.getMessageSenderId();
-        if (Objects.equals(selfUserId, senderChatId))
+        if (Objects.equals(selfUserId, senderChatId)) {
             return;
-        if (!targetChatIdByName.containsValue(senderChatId))
+        }
+        if (!targetChatIdByName.containsValue(senderChatId)) {
+            System.out.println("senderChatId: " + senderChatId);
+            String collect = targetChatIdByName.keySet().stream()
+                    .map(key -> key + "=" + targetChatIdByName.get(key))
+                    .collect(Collectors.joining(", ", "{", "}"));
+            System.out.println(collect);
             return;
+        }
         String messageContent = updateMessage.getMessageContent();
         telegramClient.sendMessageToMainChat("Пришло сообщение\n" + messageContent);
 
