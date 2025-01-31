@@ -98,9 +98,49 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
                 }
                 break;
             }
+            case TdApi.UpdateChatLastMessage.CONSTRUCTOR: {
+                TdApi.UpdateChatLastMessage updateChat = (TdApi.UpdateChatLastMessage) object;
+                //было обновлено последнее сообщение в чате по id = updateChat.chatId
+                break;
+            }
+            case TdApi.UpdateSupergroup.CONSTRUCTOR: {
+                //данные о группе или канале были изменены
+                break;
+            }
+            case TdApi.UpdateChatAddedToList.CONSTRUCTOR: {
+                //появился новый чат
+                break;
+            }
+            case TdApi.UpdateBasicGroup.CONSTRUCTOR: {
+                //данные о базовой группе были изменены
+                break;
+            }
+            case TdApi.UpdateSupergroupFullInfo.CONSTRUCTOR: {
+                ////данные о группе или канале в "какой-то структуре" были изменены
+                break;
+            }
+            case TdApi.UpdateUnreadMessageCount.CONSTRUCTOR, TdApi.UpdateChatFolders.CONSTRUCTOR,
+                 TdApi.UpdateReactionNotificationSettings.CONSTRUCTOR, TdApi.UpdateScopeNotificationSettings.CONSTRUCTOR,
+                 TdApi.UpdateChatThemes.CONSTRUCTOR, TdApi.UpdateAvailableMessageEffects.CONSTRUCTOR,
+                 TdApi.UpdateFileDownloads.CONSTRUCTOR, TdApi.UpdateDiceEmojis.CONSTRUCTOR,
+                 TdApi.UpdateDefaultBackground.CONSTRUCTOR, TdApi.UpdateAttachmentMenuBots.CONSTRUCTOR,
+                 TdApi.UpdateSpeechRecognitionTrial.CONSTRUCTOR, TdApi.UpdateProfileAccentColors.CONSTRUCTOR,
+                 TdApi.UpdateAccentColors.CONSTRUCTOR, TdApi.UpdateAnimationSearchParameters.CONSTRUCTOR,
+                 TdApi.UpdateOption.CONSTRUCTOR, TdApi.UpdateSavedMessagesTopic.CONSTRUCTOR,
+                 TdApi.UpdateHavePendingNotifications.CONSTRUCTOR, TdApi.UpdateConnectionState.CONSTRUCTOR,
+                 TdApi.UpdateStoryStealthMode.CONSTRUCTOR, TdApi.UpdateUnreadChatCount.CONSTRUCTOR,
+                 TdApi.UpdateActiveEmojiReactions.CONSTRUCTOR, TdApi.UpdateDefaultReactionType.CONSTRUCTOR,
+                 TdApi.UpdateChatReadInbox.CONSTRUCTOR, TdApi.UpdateMessageInteractionInfo.CONSTRUCTOR,
+                 TdApi.UpdateDeleteMessages.CONSTRUCTOR, TdApi.UpdateSuggestedActions.CONSTRUCTOR,
+                 TdApi.UpdateChatAvailableReactions.CONSTRUCTOR, TdApi.UpdateChatNotificationSettings.CONSTRUCTOR,
+                 TdApi.UpdateMessageEdited.CONSTRUCTOR, TdApi.UpdateMessageContent.CONSTRUCTOR,
+                 TdApi.UpdateChatActiveStories.CONSTRUCTOR, TdApi.UpdateChatReadOutbox.CONSTRUCTOR: {
+                //прочие обновления с которыми я не работал
+                break;
+            }
             default: {
-                System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
-                System.out.println("Возникло исключение в методе onResult");
+                System.out.println("Пришел телеграмм объект для которого нет обработчика");
+                System.out.println(object);
                 throw new RuntimeException("логика для обработки update [" + object + "] не реализована. " +
                         "Зайди в класс Example и перетени необходимую реализацию");
             }

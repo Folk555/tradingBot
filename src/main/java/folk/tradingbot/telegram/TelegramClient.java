@@ -114,6 +114,9 @@ public class TelegramClient {
 
     public String[] getLastMessagesTxtFromChat(Long chatId, int messagesCount) {
         TdApi.GetChatHistory tdApiFun = new TdApi.GetChatHistory(chatId, 0, 0, messagesCount, false);
+        TdApi.Messages lastMessage = sendAndWaitAns(tdApiFun, new TdApi.Messages());
+        Long startId = lastMessage.messages[0].id;
+        tdApiFun = new TdApi.GetChatHistory(chatId, startId, 0, messagesCount, false);
         TdApi.Messages lastMessages = sendAndWaitAns(tdApiFun, new TdApi.Messages());
 
         System.out.println("\n\n\n\n");

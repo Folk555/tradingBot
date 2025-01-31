@@ -62,7 +62,7 @@ public class TelegramChatListenerService {
 
         cashFlowTrader.cashFlow(messageContent);
         System.out.println("Трейдер позиции:");
-        cashFlowTrader.traderPositionRepo.getAllTraderPosition().forEach(System.out::println);
+        cashFlowTrader.traderPositionRepo.getAllTraderPositions().forEach(System.out::println);
         System.out.println("\n");
     }
 
@@ -75,7 +75,7 @@ public class TelegramChatListenerService {
         cashFlowTrader.traderIdeaRepo.getAllTraderIdeas().forEach(System.out::println);
         System.out.println("\n");
         System.out.println("Трейдер позиции:");
-        cashFlowTrader.traderPositionRepo.getAllTraderPosition().forEach(System.out::println);
+        cashFlowTrader.traderPositionRepo.getAllTraderPositions().forEach(System.out::println);
         System.out.println("\n");
     }
 

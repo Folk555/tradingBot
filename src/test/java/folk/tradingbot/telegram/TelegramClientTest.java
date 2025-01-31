@@ -62,9 +62,16 @@ class TelegramClientTest {
     }
 
     @Test
+    void sendMessageToMainChat() {
+        Mockito.doNothing().when(client).send(any(), any());
+        telegramClient.sendMessageToMainChat("Hi");
+        Mockito.verify(client).send(any(), any());
+    }
+
+    @Test
     void sendMessage() {
         Mockito.doNothing().when(client).send(any(), any());
-        telegramClient.sendMessage(435L, "Hi");
+        telegramClient.sendMessageToChat(435L, "Hi");
         Mockito.verify(client).send(any(), any());
     }
 }

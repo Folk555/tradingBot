@@ -1,44 +1,63 @@
 package folk.tradingbot.trader.dto;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-//@Entity
-//@Table(name = "trader_position")
+@Entity
+@Table(name = "trader_position")
+@Setter @Getter
+@Accessors(chain = true)
 public class TraderPosition {
-    @Getter @Setter //@Id
-    Long id;
-    String name;
-    @Getter
-    String ticker;
+    @Setter(AccessLevel.NONE)
+    @Id @GeneratedValue(strategy = IDENTITY)
+    private Long id;
+    private String name;
+    private String ticker;
     //todo пока без этого функционала
     //TraderIdea traderIdea;
-    @Setter
-    Float startPrice;
-    @Setter
-    Float profitPrice;
-    @Setter
-    Float profitPercent;
-    @Setter
-    Float stopPrice;
-    @Getter @Setter
-    boolean isClosed;
-    @Setter
-    LocalDateTime openTime;
-    @Setter
-    LocalDateTime closeTime;
+    private Float startPrice;
+    private Float profitPrice;
+    private Float profitPercent;
+    private Float closeProfitPercent;
+    private Float stopPrice;
+    private boolean isClosed;
+    private LocalDateTime openTime;
+    private LocalDateTime closeTime;
+
+    public TraderPosition(String name, String ticker, Float startPrice, Float profitPrice,
+                          Float profitPercent, Float closeProfitPercent, Float stopPrice, boolean isClosed,
+                          LocalDateTime openTime, LocalDateTime closeTime) {
+        this.name = name;
+        this.ticker = ticker;
+        this.startPrice = startPrice;
+        this.profitPrice = profitPrice;
+        this.profitPercent = profitPercent;
+        this.closeProfitPercent = closeProfitPercent;
+        this.stopPrice = stopPrice;
+        this.isClosed = isClosed;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+    }
 
     public TraderPosition(TraderPosition traderPosition) {
-        this.id = traderPosition.id;
         this.name = traderPosition.name;
         this.ticker = traderPosition.ticker;
         //this.traderIdea = traderPosition.traderIdea;
         this.startPrice = traderPosition.startPrice;
         this.profitPrice = traderPosition.profitPrice;
         this.profitPercent = traderPosition.profitPercent;
+        this.closeProfitPercent = traderPosition.closeProfitPercent;
         this.stopPrice = traderPosition.stopPrice;
         this.isClosed = traderPosition.isClosed;
         this.openTime = traderPosition.openTime;

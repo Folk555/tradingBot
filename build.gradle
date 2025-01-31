@@ -29,7 +29,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-   // implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql:42.7.5'
+    implementation 'com.zaxxer:HikariCP:6.2.1'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -40,5 +42,5 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     //VM Options для тестов запущенных через gradle
-    jvmArgs '-Djava.library.path=C:\\Users\\User\\Desktop\\stol\\td\\tdlib\\bin'
+    jvmArgs '-Djava.library.path=C:\\Users\\folk\\Desktop\\stol\\td\\tdlib\\bin'
 }

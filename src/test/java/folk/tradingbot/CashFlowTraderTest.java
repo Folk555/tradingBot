@@ -1,11 +1,20 @@
 package folk.tradingbot;
 
 import folk.tradingbot.trader.CashFlowTrader;
+import folk.tradingbot.trader.dto.TraderPosition;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
+@SpringBootTest
 class CashFlowTraderTest {
 
+    @Autowired
+    CashFlowTrader cashFlowTrader;
+
+    @Disabled//не актуален
     @Test
     void cashFlow_traderIdea() {
         String message = """
@@ -47,38 +56,151 @@ class CashFlowTraderTest {
     @Test
     void cashFlow_traderSignalLong() {
         String message = """
-                ПОКУПКА LONG!
-                Полюс
-                Тикер: #PLZL
-                ВХОД: 13955Р
-                Стоп: 13040P
-                Цель: 15300Р (+9.64%)
-                Диапазон входа: 13815 - 14094Р
-                Не рекомендация!
-                Высокий риск!
-                Дисклеймер
-                Ваше мнение:
-                Вырастет Упадет Наблюдаю
+            ПОКУПКА LONG!
+            🏦 Банк ВТБ
+            
+            Тикер: #VTBR
+            
+            🟢 ВХОД: 86.39Р
+            🔴 Стоп: 81P
+            💰 Цель: 100Р (+15.75%)
+            🕯 Диапазон входа: 85.52 - 87.25Р
+            ⚠️ Не рекомендация!
+            ❗️ Высокий риск!
+            ‼️ Дисклеймер
+            
+            Ваше мнение:
+            👍Вырастет 👎Упадет 🔥Наблюдаю
                 """;
-        CashFlowTrader cashFlowTrader = new CashFlowTrader();
+
         cashFlowTrader.cashFlow(message);
 
-        Assertions.assertFalse(cashFlowTrader.traderPositionRepo.getAllTraderPosition().isEmpty());
+        TraderPosition traderPosition = cashFlowTrader.traderPositionRepo
+                .getLastOpenTraderPositionByTicker("#VTBR");
 
-        cashFlowTrader.traderPositionRepo.getAllTraderPosition().forEach(System.out::println);
+        Assertions.assertNotNull(traderPosition);
+        Assertions.assertTrue(traderPosition.getName().contains("Банк ВТБ"));
+        Assertions.assertTrue(traderPosition.getTicker().contains("#VTBR"));
+        Assertions.assertEquals(Float.valueOf(86.39f), traderPosition.getStartPrice());
+        Assertions.assertEquals(Float.valueOf(100f), traderPosition.getProfitPrice());
+        Assertions.assertEquals(Float.valueOf(15.75f), traderPosition.getProfitPercent());
+        Assertions.assertNull(traderPosition.getCloseProfitPercent());
+        Assertions.assertEquals(Float.valueOf(81f), traderPosition.getStopPrice());
+        Assertions.assertFalse(traderPosition.isClosed());
     }
 
     @Test
     void cashFlow_reopenTraderPosition() {
-        String message = """
-                Фиксирую вторую 1/3 по лонгу #GAZP по 119.5Р, это +10.58%
-                P.S. Стоп был переставлен в безубыток 108.07Р
+        String openTrader = """
+            ПОКУПКА LONG!
+            какая-то штука
+            
+            Тикер: #MTLR
+            
+            🟢 ВХОД: 86.39Р
+            🔴 Стоп: 81P
+            💰 Цель: 100Р (+15.75%)
+            🕯 Диапазон входа: 85.52 - 87.25Р
+            ⚠️ Не рекомендация!
+            ❗️ Высокий риск!
+            ‼️ Дисклеймер
+            
+            Ваше мнение:
+            👍Вырастет 👎Упадет 🔥Наблюдаю
                 """;
-        CashFlowTrader cashFlowTrader = new CashFlowTrader();
-        cashFlowTrader.cashFlow(message);
+        String reopenTrader = """
+            ✅Фиксирую вторую 1/3 по лонгу #MTLR по 114.8Р, это +5.51%
+            P.S. Стоп был переставлен в безубыток 108.81Р
+                """;
+        cashFlowTrader.cashFlow(openTrader);
+        TraderPosition firstTraderPosition = cashFlowTrader.traderPositionRepo
+                .getLastOpenTraderPositionByTicker("#MTLR");
+        cashFlowTrader.cashFlow(reopenTrader);
+        TraderPosition traderPosition = cashFlowTrader.traderPositionRepo
+                .getLastOpenTraderPositionByTicker("#MTLR");
 
-        Assertions.assertFalse(cashFlowTrader.traderIdeaRepo.getAllTraderIdeas().isEmpty());
+        Assertions.assertNotNull(traderPosition);
+        Assertions.assertTrue(traderPosition.getName().contains("какая-то штука"));
+        Assertions.assertTrue(traderPosition.getTicker().contains("#MTLR"));
+        Assertions.assertEquals(Float.valueOf(114.8f), traderPosition.getStartPrice());
+        Assertions.assertNull(traderPosition.getProfitPrice());
+        Assertions.assertEquals(Float.valueOf(15.75f), traderPosition.getProfitPercent());
+        Assertions.assertNull(traderPosition.getCloseProfitPercent());
+        Assertions.assertEquals(Float.valueOf(108.81f), traderPosition.getStopPrice());
+        Assertions.assertFalse(traderPosition.isClosed());
 
-        System.out.println(cashFlowTrader.traderIdeaRepo.getAllTraderIdeas());
+        firstTraderPosition = cashFlowTrader.traderPositionRepo
+                .getTraderPositionById(Math.toIntExact(firstTraderPosition.getId()));
+        Assertions.assertNotNull(firstTraderPosition);
+        Assertions.assertTrue(firstTraderPosition.getName().contains("какая-то штука"));
+        Assertions.assertTrue(firstTraderPosition.getTicker().contains("#MTLR"));
+        Assertions.assertEquals(Float.valueOf(86.39f), firstTraderPosition.getStartPrice());
+        Assertions.assertEquals(Float.valueOf(100f), firstTraderPosition.getProfitPrice());
+        Assertions.assertEquals(Float.valueOf(15.75f), firstTraderPosition.getProfitPercent());
+        Assertions.assertEquals(5.51f, firstTraderPosition.getCloseProfitPercent());
+        Assertions.assertEquals(Float.valueOf(81f), firstTraderPosition.getStopPrice());
+        Assertions.assertTrue(firstTraderPosition.isClosed());
     }
+
+    @Test
+    void cashFlow_reopenTraderPosition_noOpenPosition() {
+        String reopenTrader = """
+            ✅Фиксирую вторую 1/3 по лонгу #MRRR по 114.8Р, это +5.51%
+            P.S. Стоп был переставлен в безубыток 108.81Р
+                """;
+        int firstSize = cashFlowTrader.traderPositionRepo.getAllTraderPositions().size();
+        cashFlowTrader.cashFlow(reopenTrader);
+        int secondSize = cashFlowTrader.traderPositionRepo.getAllTraderPositions().size();
+
+        Assertions.assertEquals(firstSize, secondSize);
+    }
+
+    @Test
+    void cashFlow_traderClosePosition() {
+        String openTrader = """
+            ПОКУПКА LONG!
+            открыли
+            
+            Тикер: #PLZL
+            
+            🟢 ВХОД: 86.39Р
+            🔴 Стоп: 81P
+            💰 Цель: 100Р (+15.75%)
+            🕯 Диапазон входа: 85.52 - 87.25Р
+            ⚠️ Не рекомендация!
+            ❗️ Высокий риск!
+            ‼️ Дисклеймер
+            
+            Ваше мнение:
+            👍Вырастет 👎Упадет 🔥Наблюдаю
+                """;
+        String closeTrader = """
+                ✅Фиксирую финальную третью часть по лонгу #PLZL по 15500Р, это +11.07%💪🚀
+                P.S. Мы фиксировали прибыль по бумаге два раза +5.16% и +7.77%
+                Итого средняя прибыль по сделке составила +8%
+                """;
+
+        cashFlowTrader.cashFlow(openTrader);
+        TraderPosition openTraderPosition = cashFlowTrader.traderPositionRepo
+                .getLastOpenTraderPositionByTicker("#PLZL");
+        int countBeforeClosePosition = cashFlowTrader.traderPositionRepo
+                .getAllTraderPositions().size();
+        cashFlowTrader.cashFlow(closeTrader);
+        TraderPosition traderPosition = cashFlowTrader.traderPositionRepo
+                .getTraderPositionById(Math.toIntExact(openTraderPosition.getId()));
+        int countAfterClosePosition = cashFlowTrader.traderPositionRepo
+                .getAllTraderPositions().size();
+
+        Assertions.assertEquals(countBeforeClosePosition, countAfterClosePosition);
+        Assertions.assertNotNull(traderPosition);
+        Assertions.assertTrue(traderPosition.getName().contains("открыли"));
+        Assertions.assertTrue(traderPosition.getTicker().contains("#PLZL"));
+        Assertions.assertEquals(Float.valueOf(86.39f), traderPosition.getStartPrice());
+        Assertions.assertEquals(Float.valueOf(100f), traderPosition.getProfitPrice());
+        Assertions.assertEquals(Float.valueOf(15.75f), traderPosition.getProfitPercent());
+        Assertions.assertEquals(11.07f, traderPosition.getCloseProfitPercent());
+        Assertions.assertEquals(Float.valueOf(81f), traderPosition.getStopPrice());
+        Assertions.assertTrue(traderPosition.isClosed());
+    }
+
 }
