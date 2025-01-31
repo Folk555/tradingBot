@@ -15,12 +15,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class DBConfiguration {
 
-
     @ConfigurationProperties("datasource")
     @Bean
     public HikariDataSource dataSource() {
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }
-
 
 }

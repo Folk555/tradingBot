@@ -6,10 +6,12 @@ import folk.tradingbot.trader.repository.TraderPositionRepo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.Arrays;
 
 @SpringBootApplication
+@EnableJpaRepositories(basePackages = "folk.tradingbot")
 public class TradingBotApplication {
 
     public static void main(String[] args) {
