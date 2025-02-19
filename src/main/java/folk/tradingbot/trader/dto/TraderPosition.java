@@ -34,6 +34,9 @@ public class TraderPosition {
     private boolean isClosed;
     private LocalDateTime openTime;
     private LocalDateTime closeTime;
+    private String errorCreate;
+    private String shareInstrumentId;
+    private String stopLoseOrderId;
 
     public TraderPosition(String name, String ticker, Float startPrice, Float profitPrice,
                           Float profitPercent, Float closeProfitPercent, Float stopPrice, boolean isClosed,

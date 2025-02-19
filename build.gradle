@@ -32,6 +32,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql:42.7.5'
     implementation 'com.zaxxer:HikariCP:6.2.1'
+    implementation 'ru.tinkoff.piapi:java-sdk-core:1.27'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

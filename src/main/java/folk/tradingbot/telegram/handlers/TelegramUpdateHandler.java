@@ -134,7 +134,9 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
                  TdApi.UpdateDeleteMessages.CONSTRUCTOR, TdApi.UpdateSuggestedActions.CONSTRUCTOR,
                  TdApi.UpdateChatAvailableReactions.CONSTRUCTOR, TdApi.UpdateChatNotificationSettings.CONSTRUCTOR,
                  TdApi.UpdateMessageEdited.CONSTRUCTOR, TdApi.UpdateMessageContent.CONSTRUCTOR,
-                 TdApi.UpdateChatActiveStories.CONSTRUCTOR, TdApi.UpdateChatReadOutbox.CONSTRUCTOR: {
+                 TdApi.UpdateChatActiveStories.CONSTRUCTOR, TdApi.UpdateChatReadOutbox.CONSTRUCTOR,
+                 TdApi.UpdateUserStatus.CONSTRUCTOR, TdApi.UpdateChatAction.CONSTRUCTOR,
+                 TdApi.UpdateChatReplyMarkup.CONSTRUCTOR, TdApi.UpdateMessageSendSucceeded.CONSTRUCTOR: {
                 //прочие обновления с которыми я не работал
                 break;
             }
