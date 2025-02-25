@@ -1,9 +1,12 @@
 package folk.tradingbot.tinvestapi;
 
+import folk.tradingbot.TradingBotApplication;
 import folk.tradingbot.tinvestapi.dto.TBankShare;
 import folk.tradingbot.tinvestapi.repository.ShareRepo;
 import folk.tradingbot.trader.dto.TraderPosition;
 import jakarta.annotation.PostConstruct;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.tinkoff.piapi.contract.v1.*;
 import ru.tinkoff.piapi.core.InvestApi;
@@ -19,6 +22,8 @@ import java.util.concurrent.ExecutionException;
 
 
 public class TBankClient {
+
+    private static final Logger LOGGER = LogManager.getLogger(TBankClient.class);
 
     @Autowired
     TbankConfigs configs;
