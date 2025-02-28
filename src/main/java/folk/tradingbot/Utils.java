@@ -1,5 +1,8 @@
 package folk.tradingbot;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utils {
+    private static Logger LOGGER = LogManager.getLogger(Utils.class);
     public static String printPromptAndGetAns(String prompt) {
         System.out.print(prompt);
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -21,11 +25,12 @@ public class Utils {
 
     public static void sleep(int seconds) {
         if (seconds > 60) {
-            System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
-            System.out.println("Возникло исключение в методе sleep");
+            LOGGER.error("Возникло исключение в методе sleep? А именно " +
+                    "медот Sleep будет ждать больше минуты. Не очень хорошо");
             throw new RuntimeException("Медот Sleep будет ждать больше минуты. Не очень хорошо");
         }
         try {
+            LOGGER.trace("Спим {} секунд", seconds);
             Thread.sleep(seconds * 1000L);
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -1,7 +1,9 @@
 package folk.tradingbot.telegram.models;
 
+import lombok.ToString;
 import org.drinkless.tdlib.TdApi;
 
+@ToString
 public class TelegramChat {
 
     private final TdApi.Chat tdapiChat;

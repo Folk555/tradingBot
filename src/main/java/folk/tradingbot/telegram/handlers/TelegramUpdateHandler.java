@@ -8,6 +8,8 @@ import folk.tradingbot.telegram.models.OrderedChat;
 import folk.tradingbot.telegram.models.TelegramUpdateMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.drinkless.tdlib.TdApi;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,6 +40,8 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
     private final ConcurrentMap<Long, TdApi.Chat> chats = new ConcurrentHashMap<Long, TdApi.Chat>();
     @Getter//список чатов отсортированных в классическом(как в приложении) порядке
     private final NavigableSet<OrderedChat> chatOrderList = new TreeSet<OrderedChat>();
+
+    private static Logger LOGGER = LogManager.getLogger(TelegramUpdateHandler.class);
 
     @Override
     public void onResult(TdApi.Object object) {
@@ -141,10 +145,7 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
                 break;
             }
             default: {
-                System.out.println("Пришел телеграмм объект для которого нет обработчика");
-                System.out.println(object);
-                throw new RuntimeException("логика для обработки update [" + object + "] не реализована. " +
-                        "Зайди в класс Example и перетени необходимую реализацию");
+                LOGGER.warn("Пришел телеграмм объект для которого нет обработчика\n {}", object);
             }
         }
     }
@@ -181,7 +182,7 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
                 isAuthorizated = true;
                 break;
             default:
-                System.err.println("Unsupported authorization state: " + authorizationState);
+                LOGGER.error("Unsupported authorization state: {}", authorizationState);
         }
     }
 
@@ -209,8 +210,7 @@ public class TelegramUpdateHandler implements TelegramResultHandler {
 
     public void setTelegramClient(TelegramClient telegramClient) {
         if (this.telegramClient != null) {
-            System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
-            System.out.println("Возникло исключение в методе setTelegramClient");
+            LOGGER.error("Возникло исключение в методе setTelegramClient");
             throw new RuntimeException("В 1 TelegramUpdateHandler телеграм клиент можно задать только 1 раз");
         }
         this.telegramClient = telegramClient;

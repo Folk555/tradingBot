@@ -4,6 +4,8 @@ import folk.tradingbot.Utils;
 import folk.tradingbot.telegram.configs.TDLibLogger;
 import folk.tradingbot.telegram.configs.TelegramConfigs;
 import folk.tradingbot.telegram.handlers.TelegramUpdateHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -16,18 +18,33 @@ import java.io.IOException;
 @Configuration
 @ConfigurationPropertiesScan("folk.tradingbot")
 public class TelegramClientAutoConfiguration {
+    private static Logger LOGGER = LogManager.getLogger(TelegramClientAutoConfiguration.class);
 
-    { //отключение логов
+    {
+        try {
+            String os = System.getProperty("os.name");
+            if (os != null && os.toLowerCase().startsWith("windows")) {
+                System.loadLibrary("libcrypto-3-x64");
+                System.loadLibrary("libssl-3-x64");
+                System.loadLibrary("zlib1");
+            }
+            System.loadLibrary("tdjni");
+        } catch (UnsatisfiedLinkError e) {
+            e.printStackTrace();
+        }
+
+        //отключение логов
         // set log message handler to handle only fatal errors (0) and plain log messages (-1)
+        LOGGER.trace("конструктор statiс TelegramClientAutoConfiguration");
         Client.setLogMessageHandler(0, new TDLibLogger.LogMessageHandler());
 
         // disable TDLib log and redirect fatal errors and plain log messages to a file
+        LOGGER.trace("Выключаем логи TDLIB");
         try {
             Client.execute(new TdApi.SetLogVerbosityLevel(0));
             Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile("tdlib.log", 1 << 27, false)));
         } catch (Client.ExecutionException error) {
-            System.out.println("!!!!!!!!!!!!!ВНИМАНИЕ!!!!!!!");
-            System.out.println("Возникло исключение в static TelegramClientAutoConfiguration");
+            LOGGER.error("Возникло исключение в static TelegramClientAutoConfiguration");
             throw new IOError(new IOException("Write access to the current directory is required"));
         }
     }

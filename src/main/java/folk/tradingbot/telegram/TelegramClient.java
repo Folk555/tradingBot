@@ -6,6 +6,8 @@ import folk.tradingbot.telegram.handlers.TelegramUpdateHandler;
 import folk.tradingbot.telegram.models.OrderedChat;
 import folk.tradingbot.telegram.models.TelegramChat;
 import folk.tradingbot.telegram.models.TelegramUser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +34,7 @@ public class TelegramClient {
     private TelegramUser myUser;
     @Value("${telegram.selfChatId}")
     private Long selfChat;
+    private static Logger LOGGER = LogManager.getLogger(TelegramClient.class);
 
     /**
      * Не используй этот конструктор, он нужен для юнит тестов
@@ -53,18 +56,19 @@ public class TelegramClient {
 
     public List<TelegramChat> getMainChatList(final int limit) {
         NavigableSet<OrderedChat> chatOrderList = updateHandler.getChatOrderList();
-        if (limit > chatOrderList.size()) {
-            TdApi.LoadChats tdApiFun = new TdApi.LoadChats(new TdApi.ChatListMain(), limit - chatList.size());
-            TdApi.Ok res = sendAndWaitAns(tdApiFun, new TdApi.Ok());
-            return getMainChatList(limit);
-        }
+
+        TdApi.LoadChats tdApiFun = new TdApi.LoadChats(new TdApi.ChatListMain(), limit - chatList.size());
+        sendAndWaitAns(tdApiFun, new TdApi.Ok());
+        //далее handler обработает ответ и запишет в переменную updateHandler.chats
 
         java.util.Iterator<OrderedChat> iter = chatOrderList.iterator();
         for (int i = 0; i < limit && i < chatOrderList.size(); i++) {
             long chatId = iter.next().getChatId();
             TdApi.Chat chat = updateHandler.getChats().get(chatId);
             synchronized (chat) {
-                chatList.add(new TelegramChat(chat));
+                TelegramChat telegramChat = new TelegramChat(chat);
+                LOGGER.trace("получен чат {}", telegramChat);
+                chatList.add(telegramChat);
             }
         }
         return chatList;

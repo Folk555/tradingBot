@@ -26,7 +26,7 @@ public class TBankClient {
     private static final Logger LOGGER = LogManager.getLogger(TBankClient.class);
 
     @Autowired
-    TbankConfigs configs;
+    private TbankConfigs configs;
 
     @Autowired
     private ShareRepo shareRepo;
@@ -103,17 +103,24 @@ public class TBankClient {
         return postOrderResponse.getOrderId();
     }
 
-    public void loadShares() {
+    public void updateSharesDB() {
+        LOGGER.debug("Обновление акций банка в БД начато");
         List<Share> allBankShares = getAllShares();
         allBankShares.forEach(s -> {
+            LOGGER.trace("Получена акция \n {}", s);
             String ticker1 = s.getTicker().length() > 5 ? null : s.getTicker();
             boolean isEnable = ticker1 != null && s.getIsin().contains("RU");
+            if (!isEnable) return;
 
             TBankShare tBankShare = new TBankShare(s.getIsin(), ticker1,
                     s.getClassCode(), s.getUid(), s.getName(), isEnable);
-            if (isEnable)
+            TBankShare byIsin = shareRepo.findByIsin(s.getIsin());
+            if (byIsin == null || !tBankShare.toString().equals(byIsin.toString())) {
+                LOGGER.trace("Сохраняем запись акции банка в БД\n {}", tBankShare);
                 shareRepo.save(tBankShare);
+            }
         });
+        LOGGER.debug("Завершено обновление акций банка в БД");
     }
 
     public void cancelPostStopLose(TraderPosition traderPosition) {
