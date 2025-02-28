@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Обертка над оригинальным телеграмм клиентом TDLib
  * клиент для работы с телеграммом
  */
-@PropertySource("file:application.properties")
+@PropertySource("file:./configs.properties")
 public class TelegramClient {
 
     private final TelegramUpdateHandler updateHandler;

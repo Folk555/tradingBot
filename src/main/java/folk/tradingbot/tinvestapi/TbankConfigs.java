@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "tbank")
-@PropertySource("classpath:application.properties")
+@PropertySource("file:./configs.properties")
 public class TbankConfigs {
     @Value("${tbank.token}")
     public String token;

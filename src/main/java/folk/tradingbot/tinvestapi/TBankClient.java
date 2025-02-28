@@ -1,6 +1,5 @@
 package folk.tradingbot.tinvestapi;
 
-import folk.tradingbot.TradingBotApplication;
 import folk.tradingbot.tinvestapi.dto.TBankShare;
 import folk.tradingbot.tinvestapi.repository.ShareRepo;
 import folk.tradingbot.trader.dto.TraderPosition;

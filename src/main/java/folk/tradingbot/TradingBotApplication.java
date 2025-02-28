@@ -18,7 +18,6 @@ public class TradingBotApplication {
     private static final Logger LOGGER = LogManager.getLogger(TradingBotApplication.class);
 
     public static void main(String[] args) {
-
         ConfigurableApplicationContext context = SpringApplication.run(TradingBotApplication.class, args);
         TelegramClient telegramClient = context.getBean(TelegramClient.class);
         telegramClient.sendMessageToMainChat("Запущен трейдер бот");
