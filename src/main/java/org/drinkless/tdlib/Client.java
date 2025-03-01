@@ -13,16 +13,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * Main class for interaction with the TDLib.
  */
 public final class Client {
-    static {
-        try {
-            System.loadLibrary("libcrypto-3-x64");
-            System.loadLibrary("libssl-3-x64");
-            System.loadLibrary("zlib1");
-            System.loadLibrary("tdjni");
-        } catch (UnsatisfiedLinkError e) {
-            e.printStackTrace();
-        }
-    }
+//    static {
+//        try {
+//            System.loadLibrary("libcrypto-3-x64");
+//            System.loadLibrary("libssl-3-x64");
+//            System.loadLibrary("zlib1");
+//            System.loadLibrary("tdjni");
+//        } catch (UnsatisfiedLinkError e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * Interface for handler for results of queries to TDLib and incoming updates from TDLib.

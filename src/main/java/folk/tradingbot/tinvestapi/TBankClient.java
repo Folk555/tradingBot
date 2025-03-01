@@ -105,8 +105,8 @@ public class TBankClient {
     public void updateSharesDB() {
         LOGGER.debug("Обновление акций банка в БД начато");
         List<Share> allBankShares = getAllShares();
+        LOGGER.debug("Получено {} потенциальных акций", allBankShares.size());
         allBankShares.forEach(s -> {
-            LOGGER.trace("Получена акция \n {}", s);
             String ticker1 = s.getTicker().length() > 5 ? null : s.getTicker();
             boolean isEnable = ticker1 != null && s.getIsin().contains("RU");
             if (!isEnable) return;
@@ -115,7 +115,6 @@ public class TBankClient {
                     s.getClassCode(), s.getUid(), s.getName(), isEnable);
             TBankShare byIsin = shareRepo.findByIsin(s.getIsin());
             if (byIsin == null || !tBankShare.toString().equals(byIsin.toString())) {
-                LOGGER.trace("Сохраняем запись акции банка в БД\n {}", tBankShare);
                 shareRepo.save(tBankShare);
             }
         });

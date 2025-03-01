@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'folk'
-version = '0.1'
+version = '0.2'
 
 java {
     toolchain {
@@ -16,10 +16,11 @@ java {
 
 shadowJar {
     archiveBaseName.set('tradingBot')
-    archiveVersion.set('0.1')
+    archiveVersion.set(version)
     manifest {
         attributes 'Main-Class': 'folk.tradingbot.TradingBotApplication'
     }
+    archiveClassifier = null
 }
 
 configurations {
