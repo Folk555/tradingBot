@@ -60,7 +60,7 @@ public class TBankClient {
         double kopecks = nanoPrice / 1000000000.0;
         double currentRubPricePerShare = unitPrice + kopecks;
         if (currentRubPricePerShare > maxPricePerShare) {
-            System.out.println("Цена за акцию превышает максимальную допустимую цену за акцию");
+            LOGGER.warn("Цена за акцию превышает максимальную допустимую цену за акцию");
             return null;
         }
 
@@ -68,28 +68,28 @@ public class TBankClient {
         double currentRubPricePerLot = lot * currentRubPricePerShare;
         int buyCountLots = (int) (buySum / currentRubPricePerLot);
         if (buyCountLots < 1) {
-            System.out.println("Цена за лот превышает максимальную цену закупки акций");
+            LOGGER.warn("Цена за лот превышает максимальную цену закупки акций");
             return null;
         }
         Quotation maxPriceShare = Quotation.newBuilder()
                 .setUnits((int) maxPricePerShare)
                 .setNano((int) ((maxPricePerShare - (int) maxPricePerShare) * 1000000000)).build();
 
+        LOGGER.debug("Попытка выставить заявку на покупку {} акций", buyCountLots);
         CompletableFuture<PostOrderResponse> postOrderResponseAsync = tBankApi.getOrdersService().postLimitOrder(uid, buyCountLots, maxPriceShare,
                 OrderDirection.ORDER_DIRECTION_BUY, accountId, TimeInForceType.TIME_IN_FORCE_FILL_AND_KILL,
                 null);
 
-        PostOrderResponse response;
+        PostOrderResponse response = null;
         try {
             response = postOrderResponseAsync.get();
-            System.out.println(response);
+            LOGGER.trace(response);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            LOGGER.error(e);
         } catch (ExecutionException e) {
-            System.out.println(e);
+            LOGGER.error(e);
             if (e.getLocalizedMessage().contains("30034"))
-                System.out.println("недостаточно средств");
-            throw new RuntimeException(e);
+                LOGGER.error("недостаточно средств");
         }
         return response.toString();
     }
@@ -122,10 +122,12 @@ public class TBankClient {
     }
 
     public void cancelPostStopLose(TraderPosition traderPosition) {
+        LOGGER.debug("Отменяем стоп-лос для {}", traderPosition.getTicker());
         tBankApi.getStopOrdersService().cancelStopOrderSync(accountId, traderPosition.getStopLoseOrderId());
     }
 
     public String createPostStopLose(TraderPosition traderPosition) {
+        LOGGER.debug("Устанавливаем стоп-лос для {}", traderPosition.getTicker());
         int lotsInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
         long stopPriceUnit = (long) traderPosition.getStopPrice().floatValue();
         BigDecimal stopPrice = new BigDecimal(String.valueOf(traderPosition.getStopPrice()));
@@ -133,7 +135,7 @@ public class TBankClient {
         int stopPriceNano = getNanoSumFromKopecks(stopPrice.subtract(unitPrice));
         Quotation executePrice = Quotation.newBuilder().setUnits(stopPriceUnit).setNano(stopPriceNano).build();
 
-        return tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
+        String res = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
                 traderPosition.getShareInstrumentId(),
                 lotsInPortfolio,
                 executePrice, executePrice,
@@ -141,6 +143,8 @@ public class TBankClient {
                 accountId,
                 StopOrderType.STOP_ORDER_TYPE_STOP_LOSS,
                 (UUID) null);
+        LOGGER.trace("Ответ на установку стоп-лос {}", res);
+        return res;
     }
 
     public int getLotCountInPortfolioByInstrumentId(String instrumentId) {

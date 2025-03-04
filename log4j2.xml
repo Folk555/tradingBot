@@ -13,7 +13,7 @@
     </Console>
     <RollingFile name="LogRollingFile"
                  fileName="logs/log-${date:yyyy-MM-dd}.log"
-                 filePattern="logs/log-%d{yyyy-MM-dd}-%i.log.gz">
+                 filePattern="logs/log-${yyyy-MM-dd}-%i.log.gz">
       <PatternLayout pattern="${sys:LOG_PATTERN_FILE}"/>
       <Policies>
         <SizeBasedTriggeringPolicy size="10 MB"/>
@@ -26,6 +26,8 @@
       <AppenderRef ref="Console"/>
       <AppenderRef ref="LogRollingFile"/>
     </Root>
-    <Logger name="folk" level="TRACE"/>
+    <Logger name="folk" level="TRACE">
+      <AppenderRef ref="LogRollingFile"/>
+    </Logger>
   </Loggers>
 </Configuration>

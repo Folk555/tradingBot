@@ -51,20 +51,11 @@ public class TelegramChatListenerService {
     public void processMessage(TelegramUpdateMessage updateMessage) {
         Long selfUserId = telegramClient.getMyUser().getUserId();
         Long senderChatId = updateMessage.getMessageSenderId();
-        if (Objects.equals(selfUserId, senderChatId)) {
-            return;
-        }
-        if (!targetChatIdByName.containsValue(senderChatId)) {
-            String collect = targetChatIdByName.keySet().stream()
-                    .map(key -> key + "=" + targetChatIdByName.get(key))
-                    .collect(Collectors.joining(", ", "{", "}"));
+        if (Objects.equals(selfUserId, senderChatId) || !targetChatIdByName.containsValue(senderChatId)) {
             return;
         }
         String messageContent = updateMessage.getMessageContent();
-        telegramClient.sendMessageToMainChat("Пришло сообщение\n" + messageContent);
-
         cashFlowTrader.cashFlow(messageContent);
-        cashFlowTrader.traderPositionRepo.getAllTraderPositions().forEach(System.out::println);
     }
 
     public void processMessageDebug(Long chatId) {

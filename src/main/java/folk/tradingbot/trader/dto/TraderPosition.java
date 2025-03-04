@@ -1,9 +1,6 @@
 package folk.tradingbot.trader.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -34,6 +31,7 @@ public class TraderPosition {
     private boolean isClosed;
     private LocalDateTime openTime;
     private LocalDateTime closeTime;
+    @Column(length = 1024)
     private String errorCreate;
     private String shareInstrumentId;
     private String stopLoseOrderId;

@@ -10,6 +10,8 @@ import folk.tradingbot.trader.dto.TraderPosition;
 import folk.tradingbot.trader.repository.TraderIdeaImplArrayList;
 import folk.tradingbot.trader.repository.TraderIdeaRepo;
 import folk.tradingbot.trader.repository.TraderPositionRepo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 
 @Service
 public class CashFlowTrader {
+
+    private static Logger LOGGER = LogManager.getLogger(CashFlowTrader.class);
 
     @Autowired
     private TelegramClient telegramClient;
@@ -36,14 +40,8 @@ public class CashFlowTrader {
             openPosition(message);
         else if (message.contains("Фиксирую"))
             reopenTraderPosition(message);
-        else if (message.contains("Несколько мыслей по")
-                || (message.contains("Российский фондовый рынок завершил в"))
-                || (message.contains("Друзья! На Ютуб канале"))
-                || (message.contains("вступай в Premium"))) {
-            System.out.println("ненужное сообщение получено от cashflow");
-        } else {
-            telegramClient.sendMessageToMainChat("Неожиданное сообщение в CASHFLOW\n\n" + message);
-        }
+        else
+            LOGGER.trace("ненужное сообщение получено от cashflow {}", message);
     }
 
     private void createTraderIdea(String message) {
@@ -73,14 +71,19 @@ public class CashFlowTrader {
 
         TraderPosition traderPosition = new TraderPosition(name, ticker, startPrice, profitPrice, profitPercent,
                 null, stopPrice, false, LocalDateTime.now(), null);
+        LOGGER.trace("Новая позиция-кандидат {}", traderPosition);
         TBankShare shareByTicker = shareRepo.findSharesByTicker(ticker).getFirst();
         if (shareByTicker == null) {
             traderPosition.setClosed(true);
-            traderPosition.setErrorCreate("Не смогли найти акцию");
+            traderPosition.setErrorCreate("Не смогли найти акцию в БД");
+            LOGGER.warn("Не смогли найти акцию в БД");
         } else {
             traderPosition.setShareInstrumentId(shareByTicker.getUid());
-            mainTraderGate.buyShares(traderPosition);
-            String stopLoseId = mainTraderGate.createStopLose(traderPosition);
+            LOGGER.trace("Нашли акцию в БД");
+            String res = mainTraderGate.buyShares(traderPosition);
+            String stopLoseId = null;
+            if (res != null)
+                stopLoseId = mainTraderGate.createStopLose(traderPosition);
             traderPosition.setStopLoseOrderId(stopLoseId);
         }
         traderPositionRepo.save(traderPosition);
@@ -93,8 +96,10 @@ public class CashFlowTrader {
                 "(.*)это \\+(\\d+[.]+\\d+)%(.*)", 2));
 
         TraderPosition traderPosition = traderPositionRepo.getLastOpenTraderPositionByTicker(ticker);
-        if (traderPosition == null)
+        if (traderPosition == null) {
+            LOGGER.warn("В БД не найдено открытой позиции {} для фиксирывания прибыли", ticker);
             return;
+        }
         TraderPosition newTraderPosition = new TraderPosition(traderPosition);
         traderPosition.setClosed(true);
         traderPosition.setCloseProfitPercent(closedProfitProcent);
@@ -110,10 +115,8 @@ public class CashFlowTrader {
             newTraderPosition.setStartPrice(startPrice);
             newTraderPosition.setStopPrice(stopPrice);
             newTraderPosition.setProfitPrice(null);
-
             String stopLoseId = mainTraderGate.createStopLose(newTraderPosition);
             newTraderPosition.setStopLoseOrderId(stopLoseId);
-
             traderPositionRepo.save(newTraderPosition);
             msgToMainChat = "Переставили стоп лос, новая позиция\n" + newTraderPosition;
         } else if (message.contains("финальную")) {
