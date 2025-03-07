@@ -153,7 +153,8 @@ public class TBankClient {
                 .stream()
                 .filter(position -> position.getInstrumentUid().equals(instrumentId))
                 .findFirst().orElse(null);
-        return (int) (positionInPortfolio.getQuantity().longValue() / shareInlot);
+        return positionInPortfolio == null ? 0 :
+                (int) (positionInPortfolio.getQuantity().longValue() / shareInlot);
     }
 
     private void cancelStopLose(TraderPosition traderPosition) {

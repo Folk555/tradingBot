@@ -7,4 +7,5 @@ import java.util.List;
 public interface TraderPositionRepoCustom {
     TraderPosition getLastOpenTraderPositionByTicker(String ticker);
     List<TraderPosition> getAllTraderPositions();
+    List<TraderPosition> getAllOpenTraderPositions();
 }

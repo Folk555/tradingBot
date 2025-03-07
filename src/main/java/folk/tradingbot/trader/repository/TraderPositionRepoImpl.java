@@ -22,4 +22,10 @@ public class TraderPositionRepoImpl implements TraderPositionRepoCustom {
         String query = "from TraderPosition";
         return em.createQuery(query, TraderPosition.class).getResultList();
     }
+
+    @Override
+    public List<TraderPosition> getAllOpenTraderPositions() {
+        String query = "from TraderPosition WHERE isClosed = false";
+        return em.createQuery(query, TraderPosition.class).getResultList();
+    }
 }
