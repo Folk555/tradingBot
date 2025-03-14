@@ -46,37 +46,19 @@ public class TBankClient {
         return tBankApi.getInstrumentsService().getTradableSharesSync();
     }
 
-    private Share getShareByInstrumentId(String instrumentId) {
+    public Share getShareByInstrumentId(String instrumentId) {
         return tBankApi.getInstrumentsService().getShareByUidSync(instrumentId);
     }
 
-    public String buyShares(String instrumentId, double maxPricePerShare, double buySum) {
+    public String buyShares(String instrumentId, double maxPricePerShare, long lotsCount) {
         String uid = instrumentId;
-
-        Quotation price = tBankApi.getMarketDataService().getLastPricesSync(Collections.singleton(uid)).getFirst()
-                .getPrice();
-        long unitPrice = price.getUnits();
-        long nanoPrice = price.getNano();
-        double kopecks = nanoPrice / 1000000000.0;
-        double currentRubPricePerShare = unitPrice + kopecks;
-        if (currentRubPricePerShare > maxPricePerShare) {
-            LOGGER.warn("Цена за акцию превышает максимальную допустимую цену за акцию");
-            return null;
-        }
-
-        int lot = getShareByInstrumentId(uid).getLot();
-        double currentRubPricePerLot = lot * currentRubPricePerShare;
-        int buyCountLots = (int) (buySum / currentRubPricePerLot);
-        if (buyCountLots < 1) {
-            LOGGER.warn("Цена за лот превышает максимальную цену закупки акций");
-            return null;
-        }
         Quotation maxPriceShare = Quotation.newBuilder()
                 .setUnits((int) maxPricePerShare)
                 .setNano((int) ((maxPricePerShare - (int) maxPricePerShare) * 1000000000)).build();
 
-        LOGGER.debug("Попытка выставить заявку на покупку {} акций", buyCountLots);
-        CompletableFuture<PostOrderResponse> postOrderResponseAsync = tBankApi.getOrdersService().postLimitOrder(uid, buyCountLots, maxPriceShare,
+        LOGGER.debug("Попытка выставить заявку на покупку {} акций", lotsCount);
+        CompletableFuture<PostOrderResponse> postOrderResponseAsync =
+                tBankApi.getOrdersService().postLimitOrder(uid, lotsCount, maxPriceShare,
                 OrderDirection.ORDER_DIRECTION_BUY, accountId, TimeInForceType.TIME_IN_FORCE_FILL_AND_KILL,
                 null);
 
@@ -92,6 +74,15 @@ public class TBankClient {
                 LOGGER.error("недостаточно средств");
         }
         return response.toString();
+    }
+
+    public double getCurrentSharePriceFromBroker(String uid) {
+        Quotation price = tBankApi.getMarketDataService().getLastPricesSync(Collections.singleton(uid)).getFirst()
+                .getPrice();
+        long unitPrice = price.getUnits();
+        long nanoPrice = price.getNano();
+        double kopecks = nanoPrice / 1000000000.0;
+        return unitPrice + kopecks;
     }
 
     public String saleShares(String instrumentId, int selLotsCount) {
@@ -168,12 +159,48 @@ public class TBankClient {
         return nanoSum.intValue();
     }
 
-    private Double getKopecksSumFromNano(Long nanoSum) {
+    private Double getKopecksSumFromNano(Integer nanoSum) {
         return nanoSum / 1000000000.0;
     }
 
     public Portfolio getPortfel() {
         return tBankApi.getOperationsService().getPortfolioSync(accountId);
+    }
+
+    public Double getSharePriceByTicker(String ticker) {
+        List<TBankShare> sharesByTicker = shareRepo.findSharesByTicker(ticker);
+        if (sharesByTicker.isEmpty()) {
+            LOGGER.error("В БД выгруженных акций брокера не найдена акция {}", ticker);
+            return null;
+        }
+        String instrumentId = sharesByTicker.getFirst().getUid();
+        LastPrice lastPrice = tBankApi.getMarketDataService()
+                .getLastPricesSync(Collections.singleton(instrumentId)).getFirst();
+        return lastPrice.getPrice().getUnits() + getKopecksSumFromNano(lastPrice.getPrice().getNano());
+    }
+
+    public String createPostTakeProfit(TraderPosition traderPosition) {
+        LOGGER.debug("Устанавливаем тейк профит для {}", traderPosition.getTicker());
+        int lotsInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
+        double profitPrice = traderPosition.getProfitPrice();
+        long profitPriceUnit = (long) profitPrice;
+        BigDecimal bdProfitPrice = new BigDecimal(String.valueOf(profitPrice));
+        BigDecimal unitPrice = new BigDecimal(String.valueOf(profitPriceUnit));
+        int profitPriceNano = getNanoSumFromKopecks(bdProfitPrice.subtract(unitPrice));
+        Quotation executePrice = Quotation.newBuilder().setUnits(profitPriceUnit).setNano(profitPriceNano).build();
+
+
+        String res = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
+                traderPosition.getShareInstrumentId(),
+                lotsInPortfolio,
+                executePrice, executePrice,
+                StopOrderDirection.STOP_ORDER_DIRECTION_SELL,
+                accountId,
+                StopOrderType.STOP_ORDER_TYPE_TAKE_PROFIT,
+                (UUID) null);
+
+        LOGGER.trace("Ответ на установку тейк профит {}", res);
+        return res;
     }
 
 }

@@ -11,12 +11,14 @@ import org.drinkless.tdlib.TdApi;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.io.IOError;
 import java.io.IOException;
 
 @Configuration
 @ConfigurationPropertiesScan("folk.tradingbot")
+@Profile({"prod", "test"})
 public class TelegramClientAutoConfiguration {
     private static Logger LOGGER = LogManager.getLogger(TelegramClientAutoConfiguration.class);
 

@@ -35,10 +35,12 @@ public class TraderPosition {
     private String errorCreate;
     private String shareInstrumentId;
     private String stopLoseOrderId;
+    private String takeProfitOrderId;
+    private String traderChanel;
 
     public TraderPosition(String name, String ticker, Float startPrice, Float profitPrice,
                           Float profitPercent, Float closeProfitPercent, Float stopPrice, boolean isClosed,
-                          LocalDateTime openTime, LocalDateTime closeTime) {
+                          LocalDateTime openTime, LocalDateTime closeTime, String traderChanel) {
         this.name = name;
         this.ticker = ticker;
         this.startPrice = startPrice;
@@ -49,6 +51,7 @@ public class TraderPosition {
         this.isClosed = isClosed;
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.traderChanel = traderChanel;
     }
 
     public TraderPosition(TraderPosition traderPosition) {

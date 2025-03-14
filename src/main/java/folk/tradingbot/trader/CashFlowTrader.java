@@ -70,7 +70,8 @@ public class CashFlowTrader {
         Float profitPercent = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)\\+(\\d+[.]+\\d+)%(.*)", 2));
 
         TraderPosition traderPosition = new TraderPosition(name, ticker, startPrice, profitPrice, profitPercent,
-                null, stopPrice, false, LocalDateTime.now(), null);
+                null, stopPrice, false, LocalDateTime.now(), null,
+                "СИГНАЛЫ от CASHFLOW");
         LOGGER.trace("Новая позиция-кандидат {}", traderPosition);
         TBankShare shareByTicker = shareRepo.findSharesByTicker(ticker).getFirst();
         if (shareByTicker == null) {
@@ -88,6 +89,7 @@ public class CashFlowTrader {
         }
         traderPositionRepo.save(traderPosition);
         telegramClient.sendMessageToMainChat("Открыли позицию\n" + traderPosition);
+        LOGGER.info("Новая позиция CashFlowTrader открыта {}", traderPosition);
     }
 
     private void reopenTraderPosition(String message) {
@@ -127,6 +129,7 @@ public class CashFlowTrader {
             telegramClient.sendMessageToMainChat(msgToMainChat);
         }
         telegramClient.sendMessageToMainChat(msgToMainChat);
+        LOGGER.info("Позиция CashFlowTrader переоткрыта {}", traderPosition);
     }
 
 }

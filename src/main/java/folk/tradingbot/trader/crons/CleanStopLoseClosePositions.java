@@ -17,7 +17,7 @@ public class CleanStopLoseClosePositions {
     private TraderPositionRepo traderPositionRepo;
     @Autowired
     private TBankClient tBankClient;
-    private static Logger LOGGER = LogManager.getLogger();
+    private static Logger LOGGER = LogManager.getLogger(CleanStopLoseClosePositions.class);
     @Scheduled(cron = "0 0 4 * * 0")
     public void runTask() {
         LOGGER.info("Началось выполнение крона закрытия позиций из БД которые закрылись по стоп лосу");

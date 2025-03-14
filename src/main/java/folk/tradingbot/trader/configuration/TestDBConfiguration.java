@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ConfigurationPropertiesScan("folk.tradingbot")
 @EnableJpaRepositories
 @EnableTransactionManagement
-@Profile("prod")
-public class DBConfiguration {
+@Profile("test")
+public class TestDBConfiguration {
 
     @ConfigurationProperties("datasource")
     @Bean
     public HikariDataSource dataSource() {
-        HikariConfig config = new HikariConfig("hikari.properties");
+        HikariConfig config = new HikariConfig("hikari-test.properties");
         HikariDataSource ds = new HikariDataSource(config);
         return ds;
     }

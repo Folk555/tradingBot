@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'folk'
-version = '0.3'
+version = '0.4'
 
 java {
     toolchain {
@@ -21,6 +21,8 @@ shadowJar {
         attributes 'Main-Class': 'folk.tradingbot.TradingBotApplication'
     }
     archiveClassifier = null
+    exclude 'hikari-test.properties'
+    exclude 'folk.tradingbot.trader.configuration/TestDBConfiguration.class'
 }
 
 configurations {
@@ -59,5 +61,5 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     //VM Options для тестов запущенных через gradle
-    jvmArgs '-Djava.library.path=C:\\Users\\folk\\Desktop\\stol\\td\\tdlib\\bin'
+    jvmArgs '-Djava.library.path=C:\\Users\\folk\\Desktop\\stol\\td022025\\td\\tdlib\\bin'
 }
