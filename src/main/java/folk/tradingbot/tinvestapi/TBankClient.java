@@ -101,13 +101,16 @@ public class TBankClient {
             String ticker1 = s.getTicker().length() > 5 ? null : s.getTicker();
             boolean isEnable = ticker1 != null && s.getIsin().contains("RU");
             if (!isEnable) return;
+            double minStepPrice = s.getMinPriceIncrement().getUnits() +
+                    getKopecksSumFromNano(s.getMinPriceIncrement().getNano());
 
             TBankShare tBankShare = new TBankShare(s.getIsin(), ticker1,
-                    s.getClassCode(), s.getUid(), s.getName(), isEnable);
+                    s.getClassCode(), s.getUid(), s.getName(), minStepPrice, isEnable);
             TBankShare byIsin = shareRepo.findByIsin(s.getIsin());
-            if (byIsin == null || !tBankShare.toString().equals(byIsin.toString())) {
-                shareRepo.save(tBankShare);
+            if (byIsin != null) {
+                tBankShare.setEnableForTrade(byIsin.isEnableForTrade());
             }
+            shareRepo.save(tBankShare);
         });
         LOGGER.debug("Завершено обновление акций банка в БД");
     }
@@ -201,6 +204,10 @@ public class TBankClient {
 
         LOGGER.trace("Ответ на установку тейк профит {}", res);
         return res;
+    }
+
+    public double getMinStepPrice(String uid) {
+        return shareRepo.findByIsin(uid).getMinPriceIncrement();
     }
 
 }

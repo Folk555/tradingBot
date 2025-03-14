@@ -20,23 +20,19 @@ public class MainTraderGate {
 
     @Autowired
     private TBankClient bankClient;
-    @Autowired
-    private TBankClient tBankClient;
 
     public synchronized String buyShares(TraderPosition traderPosition) {
         String instrumentId = traderPosition.getShareInstrumentId();
         double maxPricePerShare = traderPosition.getStartPrice() * 1.02;
-        int lengthAfterDot = String.valueOf(traderPosition.getStartPrice()).split("\\.")[1].length();
-        BigDecimal bd = new BigDecimal(Double.toString(maxPricePerShare));
-        maxPricePerShare = bd.setScale(lengthAfterDot, RoundingMode.HALF_UP).doubleValue();
+        maxPricePerShare = roundUpPriceForBroker(traderPosition, maxPricePerShare);
 
-        double currentRubPricePerShare = tBankClient.getCurrentSharePriceFromBroker(instrumentId);
+        double currentRubPricePerShare = bankClient.getCurrentSharePriceFromBroker(instrumentId);
         if (currentRubPricePerShare > maxPricePerShare) {
             LOGGER.warn("Цена за акцию превышает максимальную допустимую цену за акцию");
             return null;
         }
 
-        int lot = tBankClient.getShareByInstrumentId(instrumentId).getLot();
+        int lot = bankClient.getShareByInstrumentId(instrumentId).getLot();
         double currentRubPricePerLot = lot * currentRubPricePerShare;
         int buyCountLots = (int) (sumBuy / currentRubPricePerLot);
         String dBMessage = null;
@@ -65,6 +61,17 @@ public class MainTraderGate {
             return null;
         }
         return shareBuyResponse;
+    }
+
+    private double roundUpPriceForBroker(TraderPosition traderPosition, double maxPricePerShare) {
+        int lengthAfterDot = String.valueOf(traderPosition.getStartPrice()).split("\\.")[1].length();
+        BigDecimal bd = new BigDecimal(Double.toString(maxPricePerShare));
+        double minStepPrice = bankClient.getMinStepPrice(traderPosition.getShareInstrumentId());
+        double divide = bd.divide(new BigDecimal(Double.toString(minStepPrice))).doubleValue();
+        int intDivide = (int) divide;
+        if (divide == intDivide)
+            return bd.setScale(lengthAfterDot, RoundingMode.HALF_UP).doubleValue();
+        return new BigDecimal(Double.toString(minStepPrice)).multiply(BigDecimal.valueOf(intDivide)).doubleValue();
     }
 
     /**

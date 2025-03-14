@@ -19,14 +19,17 @@ public class TBankShare {
     private String classCode;
     private String uid;
     private String name;
+    private double minPriceIncrement;
     private boolean isEnableForTrade;
 
-    public TBankShare(String isin, String ticker, String classCode, String uid, String name, boolean isEnableForTrade) {
+    public TBankShare(String isin, String ticker, String classCode, String uid, String name,
+                      double minPriceIncrement, boolean isEnableForTrade) {
         this.isin = isin;
         this.ticker = ticker;
         this.classCode = classCode;
         this.uid = uid;
         this.name = name;
+        this.minPriceIncrement = minPriceIncrement;
         this.isEnableForTrade = isEnableForTrade;
     }
 }
