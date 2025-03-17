@@ -3,7 +3,10 @@ package folk.tradingbot.tinvestapi.dto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @NoArgsConstructor
@@ -19,7 +22,7 @@ public class TBankShare {
     private String classCode;
     private String uid;
     private String name;
-    private double minPriceIncrement;
+    private Double minPriceIncrement;
     private boolean isEnableForTrade;
 
     public TBankShare(String isin, String ticker, String classCode, String uid, String name,

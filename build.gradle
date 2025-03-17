@@ -2,11 +2,10 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
-    id 'com.gradleup.shadow' version '9.0.0-beta9'
 }
 
 group = 'folk'
-version = '0.5'
+version = '1.0'
 
 java {
     toolchain {
@@ -14,15 +13,12 @@ java {
     }
 }
 
-shadowJar {
+bootJar {
     archiveBaseName.set('tradingBot')
     archiveVersion.set(version)
-    manifest {
-        attributes 'Main-Class': 'folk.tradingbot.TradingBotApplication'
-    }
     archiveClassifier = null
     exclude 'hikari-test.properties'
-    exclude 'folk.tradingbot.trader.configuration/TestDBConfiguration.class'
+    exclude 'folk/tradingbot/trader/configuration/TestDBConfiguration.class'
 }
 
 configurations {
