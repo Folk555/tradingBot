@@ -14,6 +14,4 @@ public class TelegramConfigs {
     public String apiHash;
     @Value( "${telegram.tdlib}" )
     public String tdlib;
-    @Value( "${telegram.trading_chat_name}" )
-    public String tradingChatName;
 }
