@@ -4,14 +4,15 @@ import folk.tradingbot.telegram.TelegramClient;
 import folk.tradingbot.tinvestapi.TBankClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.concurrent.CountDownLatch;
 
+@EnableAspectJAutoProxy
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "folk.tradingbot")
 public class TradingBotApplication {
@@ -22,6 +23,12 @@ public class TradingBotApplication {
         ConfigurableApplicationContext context = SpringApplication.run(TradingBotApplication.class, args);
         TelegramClient telegramClient = context.getBean(TelegramClient.class);
         telegramClient.sendMessageToMainChat("Запущен трейдер бот");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOGGER.info("Получен сигнал на выключение jvm");
+            telegramClient.sendMessageToMainChat("Бот выключается(получен сигнал выкл)");
+        }));
+
         TBankClient tBankClient = context.getBean(TBankClient.class);
         tBankClient.updateSharesDB();
 

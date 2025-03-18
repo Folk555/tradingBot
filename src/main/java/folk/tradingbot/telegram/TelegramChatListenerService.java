@@ -55,7 +55,7 @@ public class TelegramChatListenerService {
         Long senderChatId = updateMessage.getMessageSenderId();
         String messageContent = updateMessage.getMessageContent();
         if (Objects.equals(selfUserId, senderChatId) || !targetChatIdByName.containsValue(senderChatId)) {
-            LOGGER.trace("Пришло сообщение, которое пропускаем {}", updateMessage.getMessageContent());
+            LOGGER.trace("Пришло сообщение, которое пропускаем\n {}", updateMessage.getMessageContent());
             return;
         }
         if (targetChatIdByName.get(tgCashFlowName).equals(senderChatId)) {
