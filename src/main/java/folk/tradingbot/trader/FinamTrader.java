@@ -41,6 +41,7 @@ public class FinamTrader {
     }
 
     private void openPosition(String message) {
+        LOGGER.info("Начинаем открывать позицию от Финам");
         String name = message.split("\n")[0];
         String ticker = Utils.findGroupFromRegax(message, "(.*?)Тикер: #(\\w+)(.*)", 2);
         Float stopPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Стоп-приказ: (\\d+[.]?\\d*)( руб.)(.*)", 2));
