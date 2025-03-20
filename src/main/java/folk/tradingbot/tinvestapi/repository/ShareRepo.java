@@ -10,4 +10,5 @@ import java.util.List;
 public interface ShareRepo extends CrudRepository<TBankShare, Integer> {
     List<TBankShare> findSharesByTicker(String ticker);
     TBankShare findByIsin(String isin);
+    TBankShare findByUid(String uid);
 }

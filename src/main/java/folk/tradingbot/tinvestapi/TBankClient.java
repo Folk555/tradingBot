@@ -206,8 +206,9 @@ public class TBankClient {
         return res;
     }
 
-    public double getMinStepPrice(String uid) {
-        return shareRepo.findByIsin(uid).getMinPriceIncrement();
+    public Double getMinStepPrice(String uid) {
+        TBankShare byUid = shareRepo.findByUid(uid);
+        return byUid == null ? null : byUid.getMinPriceIncrement();
     }
 
 }

@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table
+@Table(name = "tbank_share")
 @Setter @Getter
 @Accessors(chain = true)
 public class TBankShare {

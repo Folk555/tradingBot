@@ -22,10 +22,10 @@ public class MainTraderGate {
     private TBankClient bankClient;
 
     public synchronized String buyShares(TraderPosition traderPosition) {
+        LOGGER.info("начинаем покупку акций {}", traderPosition.getName());
         String instrumentId = traderPosition.getShareInstrumentId();
         double maxPricePerShare = traderPosition.getStartPrice() * 1.02;
         maxPricePerShare = roundUpPriceForBroker(traderPosition, maxPricePerShare);
-
         double currentRubPricePerShare = bankClient.getCurrentSharePriceFromBroker(instrumentId);
         if (currentRubPricePerShare > maxPricePerShare) {
             LOGGER.warn("Цена за акцию превышает максимальную допустимую цену за акцию");
@@ -60,10 +60,12 @@ public class MainTraderGate {
             traderPosition.setClosed(true);
             return null;
         }
+        LOGGER.info("Покупка акций {} завершена", traderPosition.getName());
         return shareBuyResponse;
     }
 
     private double roundUpPriceForBroker(TraderPosition traderPosition, double maxPricePerShare) {
+        LOGGER.debug("Начат расчет закупочной цены акций с учетом шага цены");
         int lengthAfterDot = String.valueOf(traderPosition.getStartPrice()).split("\\.")[1].length();
         BigDecimal bd = new BigDecimal(Double.toString(maxPricePerShare));
         double minStepPrice = bankClient.getMinStepPrice(traderPosition.getShareInstrumentId());
@@ -71,7 +73,9 @@ public class MainTraderGate {
         int intDivide = (int) divide;
         if (divide == intDivide)
             return bd.setScale(lengthAfterDot, RoundingMode.HALF_UP).doubleValue();
-        return new BigDecimal(Double.toString(minStepPrice)).multiply(BigDecimal.valueOf(intDivide)).doubleValue();
+        double v = new BigDecimal(Double.toString(minStepPrice)).multiply(BigDecimal.valueOf(intDivide)).doubleValue();
+        LOGGER.debug("Расчитали закупочную цену акций с учетом шага цены {}", v);
+        return v;
     }
 
     /**
