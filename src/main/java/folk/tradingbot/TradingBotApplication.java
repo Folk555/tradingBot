@@ -9,12 +9,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.concurrent.CountDownLatch;
 
 @EnableAspectJAutoProxy
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "folk.tradingbot")
+@EnableScheduling
 public class TradingBotApplication {
 
     private static final Logger LOGGER = LogManager.getLogger(TradingBotApplication.class);
