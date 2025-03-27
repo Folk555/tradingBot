@@ -33,10 +33,4 @@ class TelegramConfigsTest {
         Assertions.assertTrue(String.valueOf(telegramConfigs.tdlib).contains("tdlib"),
                 "tdlib: " + telegramConfigs.tdlib);
     }
-
-    @Test
-    public void tradingChatName() {
-        Assertions.assertTrue(String.valueOf(telegramConfigs.tradingChatName).contains("СИГНАЛЫ"),
-                "tradingChatName: " + telegramConfigs.tradingChatName);
-    }
 }

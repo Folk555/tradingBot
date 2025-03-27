@@ -38,9 +38,17 @@ public class Utils {
     }
 
     public static String findGroupFromRegax(String text, String regax, int groupNum) {
-        Pattern pattern = Pattern.compile(regax, Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(text);
-        boolean matches = matcher.matches();
-        return matcher.group(groupNum);
+        try {
+            Pattern pattern = Pattern.compile(regax, Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(text);
+            if (!matcher.matches()) {
+                throw new IllegalArgumentException("Паттерн '" + regax + "' не был найден в тексте");
+            }
+            return matcher.group(groupNum);
+        } catch (Exception e) {
+            LOGGER.error("Ошибка в  findGroupFromRegax. Text: '{}', Regex: '{}', Group: {}",
+                    text, regax, groupNum, e);
+            throw e;
+        }
     }
 }

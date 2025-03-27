@@ -35,7 +35,6 @@ public class TelegramChatListenerService {
     private Map<String, Long> targetChatIdByName = new HashMap<>();
 
     private String tgCashFlowName = "СИГНАЛЫ от CASHFLOW";
-    private String tgChatGpt = "ChatGPT Midjourney :: BotHub Bot";
     private String tgFinamName = "Финам Торговые сигналы";
     private String tgDeepSeekBot = "DeepSeek AI | Нейросеть";
 
@@ -44,7 +43,7 @@ public class TelegramChatListenerService {
     @PostConstruct
     private void init() {
         LOGGER.info("Пост инициализация TelegramChatListenerService");
-        targetChatName = new HashSet<>(List.of(tgCashFlowName, tgChatGpt, tgFinamName, tgDeepSeekBot));
+        targetChatName = new HashSet<>(List.of(tgCashFlowName, tgFinamName, tgDeepSeekBot));
         List<TelegramChat> mainChatList = telegramClient.getMainChatList(40);
         mainChatList.stream().filter(telegramChat -> targetChatName.contains(telegramChat.getChatName()))
                 .forEach(telegramChat -> targetChatIdByName.put(telegramChat.getChatName(), telegramChat.getId()));
@@ -64,8 +63,7 @@ public class TelegramChatListenerService {
             cashFlowTrader.cashFlow(messageContent);
         } else if (targetChatIdByName.get(tgFinamName).equals(senderChatId) ) {
             finamTrader.finamTrader(messageContent);
-        } else if (targetChatIdByName.get(tgChatGpt).equals(senderChatId) ||
-                targetChatIdByName.get(tgDeepSeekBot).equals(senderChatId) ) {
+        } else if (targetChatIdByName.get(tgDeepSeekBot).equals(senderChatId) ) {
             String message = "Пришло тестовое сообщение " + messageContent;
             LOGGER.info(message);
             telegramClient.sendMessageToMainChat(message);

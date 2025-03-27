@@ -6,8 +6,6 @@ import folk.tradingbot.tinvestapi.TBankClient;
 import folk.tradingbot.tinvestapi.dto.TBankShare;
 import folk.tradingbot.tinvestapi.repository.ShareRepo;
 import folk.tradingbot.trader.dto.TraderPosition;
-import folk.tradingbot.trader.repository.TraderIdeaImplArrayList;
-import folk.tradingbot.trader.repository.TraderIdeaRepo;
 import folk.tradingbot.trader.repository.TraderPositionRepo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +23,6 @@ public class FinamTrader {
     private TelegramClient telegramClient;
     @Autowired
     private TBankClient tBankClient;
-    public TraderIdeaRepo traderIdeaRepo = new TraderIdeaImplArrayList();
     @Autowired
     public TraderPositionRepo traderPositionRepo;
     @Autowired
@@ -44,10 +41,12 @@ public class FinamTrader {
         LOGGER.info("Начинаем открывать позицию от Финам");
         String name = message.split("\n")[0];
         String ticker = Utils.findGroupFromRegax(message, "(.*?)Тикер: #(\\w+)(.*)", 2);
-        Float stopPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Стоп-приказ: (\\d+[.]?\\d*)( руб.)(.*)", 2));
-        Float profitPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Цель: (\\d+[.]?\\d*)( руб.)(.*)", 2));
-        String groupFromRegax = Utils.findGroupFromRegax(message, "(.*)Потенциал идеи: +(\\d+[,\\d]*)%(.*)", 2);
-        Float profitPercent = Float.parseFloat(groupFromRegax.replace(',', '.'));
+        String regaxStopPrice = Utils.findGroupFromRegax(message, "(.*)Стоп-приказ: (\\d+[.|,]?\\d*)( руб.)(.*)", 2);
+        Float stopPrice = Float.parseFloat(regaxStopPrice.replace(',','.'));
+        String regaxProfitPrice = Utils.findGroupFromRegax(message, "(.*)Цель: (\\d+[.|,]?\\d*)( руб.)(.*)", 2);
+        Float profitPrice = Float.parseFloat(regaxProfitPrice.replace(',','.'));
+        String regaxProfitPrecent = Utils.findGroupFromRegax(message, "(.*)Потенциал идеи: +(\\d+[,\\d]*)%(.*)", 2);
+        Float profitPercent = Float.parseFloat(regaxProfitPrecent.replace(',', '.'));
         Float startPrice = tBankClient.getSharePriceByTicker(ticker).floatValue();
 
         TraderPosition traderPosition = new TraderPosition(name, ticker, startPrice, profitPrice, profitPercent,
