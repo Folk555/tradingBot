@@ -121,27 +121,6 @@ public class TBankClient {
         tBankApi.getStopOrdersService().cancelStopOrderSync(accountId, traderPosition.getStopLoseOrderId());
     }
 
-    public String createPostStopLose(TraderPosition traderPosition) {
-        LOGGER.debug("Устанавливаем стоп-лос для {}", traderPosition.getTicker());
-        int lotsInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
-        long stopPriceUnit = (long) traderPosition.getStopPrice().floatValue();
-        BigDecimal stopPrice = new BigDecimal(String.valueOf(traderPosition.getStopPrice()));
-        BigDecimal unitPrice = new BigDecimal(String.valueOf(stopPriceUnit));
-        int stopPriceNano = getNanoSumFromKopecks(stopPrice.subtract(unitPrice));
-        Quotation executePrice = Quotation.newBuilder().setUnits(stopPriceUnit).setNano(stopPriceNano).build();
-
-        String res = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
-                traderPosition.getShareInstrumentId(),
-                lotsInPortfolio,
-                executePrice, executePrice,
-                StopOrderDirection.STOP_ORDER_DIRECTION_SELL,
-                accountId,
-                StopOrderType.STOP_ORDER_TYPE_STOP_LOSS,
-                (UUID) null);
-        LOGGER.trace("Ответ на установку стоп-лос {}", res);
-        return res;
-    }
-
     public int getLotCountInPortfolioByInstrumentId(String instrumentId) {
         int shareInlot = tBankApi.getInstrumentsService().getShareByUidSync(instrumentId).getLot();
         Position positionInPortfolio = tBankApi.getOperationsService().getPortfolioSync(accountId).getPositions()
@@ -183,39 +162,48 @@ public class TBankClient {
         return lastPrice.getPrice().getUnits() + getKopecksSumFromNano(lastPrice.getPrice().getNano());
     }
 
-    public String createPostTakeProfit(TraderPosition traderPosition) {
-        LOGGER.debug("Устанавливаем тейк профит для {}", traderPosition.getTicker());
-        int lotsInPortfolio = 0;
-        for (int i = 0; i < 10; i++) {
-            lotsInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
-            if (lotsInPortfolio != 0)
-                break;
-            else
-                Utils.sleep(1);
-        }
-        if (lotsInPortfolio == 0) {
-            LOGGER.error("Невозможно создать тейк провит так как в портфеле нет акций {}", traderPosition.getName());
-            return null;
-        }
-        double profitPrice = traderPosition.getProfitPrice();
-        long profitPriceUnit = (long) profitPrice;
-        BigDecimal bdProfitPrice = new BigDecimal(String.valueOf(profitPrice));
-        BigDecimal unitPrice = new BigDecimal(String.valueOf(profitPriceUnit));
-        int profitPriceNano = getNanoSumFromKopecks(bdProfitPrice.subtract(unitPrice));
-        Quotation executePrice = Quotation.newBuilder().setUnits(profitPriceUnit).setNano(profitPriceNano).build();
-        LOGGER.trace("Тейк профит просчитан на {}", executePrice);
+    public String createPostStopLose(TraderPosition traderPosition) {
+        return createStopOrder(traderPosition,
+                traderPosition.getStopPrice().floatValue(),
+                StopOrderType.STOP_ORDER_TYPE_STOP_LOSS);
+    }
 
-        String res = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
+    public String createPostTakeProfit(TraderPosition traderPosition) {
+        return createStopOrder(traderPosition,
+                traderPosition.getProfitPrice(),
+                StopOrderType.STOP_ORDER_TYPE_TAKE_PROFIT);
+    }
+
+    private String createStopOrder(TraderPosition traderPosition, double price, StopOrderType orderType) {
+        String orderName = orderType == StopOrderType.STOP_ORDER_TYPE_TAKE_PROFIT ? "тейк-профит" : "стоп-лос";
+        LOGGER.debug("Устанавливаем {} для {}", orderName, traderPosition.getTicker());
+
+        long units = (long) price;
+        BigDecimal nanoPart = BigDecimal.valueOf(price).subtract(BigDecimal.valueOf(units));
+        int nano = getNanoSumFromKopecks(nanoPart);
+
+        Quotation priceQuotation = Quotation.newBuilder()
+                .setUnits(units)
+                .setNano(nano)
+                .build();
+
+        int lotCountInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
+
+        LOGGER.debug("Устанавливаем {} установлен на цену {} для {} акций",
+                orderName, priceQuotation, lotCountInPortfolio);
+
+        String result = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
                 traderPosition.getShareInstrumentId(),
-                lotsInPortfolio,
-                executePrice, executePrice,
+                lotCountInPortfolio,
+                priceQuotation,
+                priceQuotation,
                 StopOrderDirection.STOP_ORDER_DIRECTION_SELL,
                 accountId,
-                StopOrderType.STOP_ORDER_TYPE_TAKE_PROFIT,
+                orderType,
                 (UUID) null);
 
-        LOGGER.trace("Ответ на установку тейк профит {}", res);
-        return res;
+        LOGGER.debug("Ответ на установку {} {}", orderName, result);
+        return result;
     }
 
     public Double getMinStepPrice(String uid) {
