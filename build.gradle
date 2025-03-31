@@ -58,4 +58,5 @@ tasks.named('test') {
     useJUnitPlatform()
     //VM Options для тестов запущенных через gradle
     jvmArgs '-Djava.library.path=C:\\Users\\folk\\Desktop\\stol\\td022025\\td\\tdlib\\bin'
+    systemProperty 'spring.profiles.active', 'test'
 }

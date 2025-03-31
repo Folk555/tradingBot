@@ -1,5 +1,6 @@
 package folk.tradingbot.tinvestapi;
 
+import folk.tradingbot.Utils;
 import folk.tradingbot.tinvestapi.dto.TBankShare;
 import folk.tradingbot.tinvestapi.repository.ShareRepo;
 import folk.tradingbot.trader.dto.TraderPosition;
@@ -184,14 +185,25 @@ public class TBankClient {
 
     public String createPostTakeProfit(TraderPosition traderPosition) {
         LOGGER.debug("Устанавливаем тейк профит для {}", traderPosition.getTicker());
-        int lotsInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
+        int lotsInPortfolio = 0;
+        for (int i = 0; i < 10; i++) {
+            lotsInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
+            if (lotsInPortfolio != 0)
+                break;
+            else
+                Utils.sleep(1);
+        }
+        if (lotsInPortfolio == 0) {
+            LOGGER.error("Невозможно создать тейк провит так как в портфеле нет акций {}", traderPosition.getName());
+            return null;
+        }
         double profitPrice = traderPosition.getProfitPrice();
         long profitPriceUnit = (long) profitPrice;
         BigDecimal bdProfitPrice = new BigDecimal(String.valueOf(profitPrice));
         BigDecimal unitPrice = new BigDecimal(String.valueOf(profitPriceUnit));
         int profitPriceNano = getNanoSumFromKopecks(bdProfitPrice.subtract(unitPrice));
         Quotation executePrice = Quotation.newBuilder().setUnits(profitPriceUnit).setNano(profitPriceNano).build();
-
+        LOGGER.trace("Тейк профит просчитан на {}", executePrice);
 
         String res = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
                 traderPosition.getShareInstrumentId(),
