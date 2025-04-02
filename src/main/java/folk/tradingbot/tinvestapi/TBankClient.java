@@ -164,13 +164,13 @@ public class TBankClient {
 
     public String createPostStopLose(TraderPosition traderPosition) {
         return createStopOrder(traderPosition,
-                traderPosition.getStopPrice().floatValue(),
+                new BigDecimal(String.valueOf(traderPosition.getStopPrice())).doubleValue(),
                 StopOrderType.STOP_ORDER_TYPE_STOP_LOSS);
     }
 
     public String createPostTakeProfit(TraderPosition traderPosition) {
         return createStopOrder(traderPosition,
-                traderPosition.getProfitPrice(),
+                new BigDecimal(String.valueOf(traderPosition.getProfitPrice())).doubleValue(),
                 StopOrderType.STOP_ORDER_TYPE_TAKE_PROFIT);
     }
 
@@ -189,18 +189,23 @@ public class TBankClient {
 
         int lotCountInPortfolio = getLotCountInPortfolioByInstrumentId(traderPosition.getShareInstrumentId());
 
-        LOGGER.debug("Устанавливаем {} установлен на цену {} для {} акций",
+        LOGGER.debug("Устанавливаем {} на цену {} для {} акций",
                 orderName, priceQuotation, lotCountInPortfolio);
 
-        String result = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
-                traderPosition.getShareInstrumentId(),
-                lotCountInPortfolio,
-                priceQuotation,
-                priceQuotation,
-                StopOrderDirection.STOP_ORDER_DIRECTION_SELL,
-                accountId,
-                orderType,
-                (UUID) null);
+        String result;
+        try {
+            result = tBankApi.getStopOrdersService().postStopOrderGoodTillCancelSync(
+                    traderPosition.getShareInstrumentId(),
+                    lotCountInPortfolio,
+                    priceQuotation,
+                    priceQuotation,
+                    StopOrderDirection.STOP_ORDER_DIRECTION_SELL,
+                    accountId,
+                    orderType,
+                    (UUID) null);
+        } catch (Exception e) {
+            result = "Ошибка!!!\n" + e.getMessage();
+        }
 
         LOGGER.debug("Ответ на установку {} {}", orderName, result);
         return result;
