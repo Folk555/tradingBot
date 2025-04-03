@@ -66,5 +66,10 @@ public class TraderPosition {
         this.isClosed = traderPosition.isClosed;
         this.openTime = traderPosition.openTime;
         this.closeTime = traderPosition.closeTime;
+        this.traderChanel = traderPosition.traderChanel;
+        this.errorCreate = traderPosition.errorCreate;
+        this.shareInstrumentId = traderPosition.shareInstrumentId;
+        this.stopLoseOrderId = traderPosition.stopLoseOrderId;
+        this.takeProfitOrderId = traderPosition.takeProfitOrderId;
     }
 }

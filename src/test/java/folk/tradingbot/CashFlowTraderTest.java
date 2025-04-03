@@ -203,4 +203,32 @@ class CashFlowTraderTest {
         Assertions.assertTrue(traderPosition.isClosed());
     }
 
+    @Test
+    void cashFlow_reopenTraderPosition_debug() {
+        String openTrader = """
+                "ПОКУПКА LONG!
+                Транснефть - привилегированные акции
+                
+                Тикер: #TRNFP
+                
+                 ВХОД: 1300Р
+                 Стоп: 1152P
+                 Цель: 1633Р (+31.06%)
+                 Диапазон входа: 1233 - 1258Р
+                 Не рекомендация!
+                 Высокий риск!
+                 Дисклеймер
+                
+                Ваше мнение:
+                Вырастет Упадет Наблюдаю"
+                """;
+        cashFlowTrader.cashFlow(openTrader);
+
+        String reopenTrader = """
+            ✅Фиксирую первую 1/3 по лонгу #TRNFP по 1300Р это +4.33%
+            P.S. Стоп был переставлен в безубыток 1246Р
+            """;
+        cashFlowTrader.cashFlow(reopenTrader);
+    }
+
 }

@@ -1,6 +1,5 @@
 package folk.tradingbot.tinvestapi;
 
-import folk.tradingbot.Utils;
 import folk.tradingbot.tinvestapi.dto.TBankShare;
 import folk.tradingbot.tinvestapi.repository.ShareRepo;
 import folk.tradingbot.trader.dto.TraderPosition;
@@ -122,6 +121,8 @@ public class TBankClient {
     }
 
     public int getLotCountInPortfolioByInstrumentId(String instrumentId) {
+        if (instrumentId == null)
+            LOGGER.error("Для поиска акций в портфеле не передан instrumentId");
         int shareInlot = tBankApi.getInstrumentsService().getShareByUidSync(instrumentId).getLot();
         Position positionInPortfolio = tBankApi.getOperationsService().getPortfolioSync(accountId).getPositions()
                 .stream()
