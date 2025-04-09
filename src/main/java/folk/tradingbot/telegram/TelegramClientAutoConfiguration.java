@@ -49,6 +49,7 @@ public class TelegramClientAutoConfiguration {
             LOGGER.error("Возникло исключение в static TelegramClientAutoConfiguration");
             throw new IOError(new IOException("Write access to the current directory is required"));
         }
+        LOGGER.trace("Статик конструктор TelegramClientAutoConfiguration отработал");
     }
 
     @Bean
