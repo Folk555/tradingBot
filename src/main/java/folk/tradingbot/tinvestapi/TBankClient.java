@@ -47,7 +47,10 @@ public class TBankClient {
     }
 
     public Share getShareByInstrumentId(String instrumentId) {
-        return tBankApi.getInstrumentsService().getShareByUidSync(instrumentId);
+        LOGGER.trace("Получаем акцию по uid {}", instrumentId);
+        Share shareByUidSync = tBankApi.getInstrumentsService().getShareByUidSync(instrumentId);
+        LOGGER.trace("Получили акцию по {}", shareByUidSync);
+        return shareByUidSync;
     }
 
     public String buyShares(String instrumentId, double maxPricePerShare, long lotsCount) {
@@ -77,12 +80,15 @@ public class TBankClient {
     }
 
     public double getCurrentSharePriceFromBroker(String uid) {
+        LOGGER.trace("Получаем текущую цену за акцию {} на брокере(бирже)", uid);
         Quotation price = tBankApi.getMarketDataService().getLastPricesSync(Collections.singleton(uid)).getFirst()
                 .getPrice();
         long unitPrice = price.getUnits();
         long nanoPrice = price.getNano();
         double kopecks = nanoPrice / 1000000000.0;
-        return unitPrice + kopecks;
+        double price1 = unitPrice + kopecks;
+        LOGGER.trace("Цена за акцию {} на брокере(бирже): {}", uid, price1);
+        return price1;
     }
 
     public String saleShares(String instrumentId, int selLotsCount) {

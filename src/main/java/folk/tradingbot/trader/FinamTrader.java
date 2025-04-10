@@ -49,6 +49,10 @@ public class FinamTrader {
         Float profitPercent = Float.parseFloat(regaxProfitPrecent.replace(',', '.'));
         Float startPrice = tBankClient.getSharePriceByTicker(ticker).floatValue();
 
+        if (traderPositionRepo.getLastOpenTraderPositionByTicker(ticker) != null) {
+            LOGGER.info("Позиция по тикеру {} уже открыта", ticker);
+        }
+
         TraderPosition traderPosition = new TraderPosition(name, ticker, startPrice, profitPrice, profitPercent,
                 null, stopPrice, false, LocalDateTime.now(), null, "Финам Торговые сигналы");
         LOGGER.trace("Новая позиция-кандидат {}", traderPosition);
