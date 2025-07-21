@@ -206,8 +206,8 @@ class CashFlowTraderTest {
     @Test
     void cashFlow_reopenTraderPosition_debug() {
         String openTrader = """
-                "ПОКУПКА LONG!
-                Роснефть
+                ПОКУПКА LONG!
+                🏦T-Технологии
                 
                 Тикер: #ROSN
                 

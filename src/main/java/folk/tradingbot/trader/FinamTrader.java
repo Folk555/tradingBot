@@ -45,7 +45,7 @@ public class FinamTrader {
         Float stopPrice = Float.parseFloat(regaxStopPrice.replace(',','.'));
         String regaxProfitPrice = Utils.findGroupFromRegax(message, "(.*)Цель: (\\d+[.|,]?\\d*)( руб.)(.*)", 2);
         Float profitPrice = Float.parseFloat(regaxProfitPrice.replace(',','.'));
-        String regaxProfitPrecent = Utils.findGroupFromRegax(message, "(.*)Потенциал идеи: +(\\d+[,\\d]*)%(.*)", 2);
+        String regaxProfitPrecent = Utils.findGroupFromRegax(message, "(.*)Потенциал идеи: +(\\d+[.|,\\d]*)%(.*)", 2);
         Float profitPercent = Float.parseFloat(regaxProfitPrecent.replace(',', '.'));
         Float startPrice = tBankClient.getSharePriceByTicker(ticker).floatValue();
 

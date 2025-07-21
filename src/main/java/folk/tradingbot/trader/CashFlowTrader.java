@@ -63,12 +63,12 @@ public class CashFlowTrader {
 
     private void openPosition(String message) {
         LOGGER.info("Начинаем открывать позицию от CashFlow");
-        String name = Utils.findGroupFromRegax(message, "(.*)ПОКУПКА LONG!\n(\\W+)\n(.*)", 2);
+        String name = Utils.findGroupFromRegax(message, "(.*)ПОКУПКА LONG!\n(.*?)\n", 2);
         String ticker = Utils.findGroupFromRegax(message, "(.*?)#(\\w+)(.*)", 2);
         Float startPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)ВХОД: (\\d+[.]?\\d*)(Р|P)+(.*)", 2));
         Float stopPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Стоп: (\\d+[.]?\\d*)(Р|P)(.*)", 2));
         Float profitPrice = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)Цель: (\\d+[.]?\\d*)(Р|P)(.*)", 2));
-        Float profitPercent = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)\\+(\\d+[.]+\\d+)%(.*)", 2));
+        Float profitPercent = Float.parseFloat(Utils.findGroupFromRegax(message, "(.*)\\+(\\d?[.]?\\d+)%(.*)", 2));
 
         TraderPosition traderPosition = new TraderPosition(name, ticker, startPrice, profitPrice, profitPercent,
                 null, stopPrice, false, LocalDateTime.now(), null,

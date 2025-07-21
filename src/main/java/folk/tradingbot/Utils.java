@@ -41,7 +41,7 @@ public class Utils {
         try {
             Pattern pattern = Pattern.compile(regax, Pattern.DOTALL);
             Matcher matcher = pattern.matcher(text);
-            if (!matcher.matches()) {
+            if (!matcher.find()) {
                 throw new IllegalArgumentException("Паттерн '" + regax + "' не был найден в тексте");
             }
             return matcher.group(groupNum);
