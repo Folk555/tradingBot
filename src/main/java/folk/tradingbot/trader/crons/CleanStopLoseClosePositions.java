@@ -30,6 +30,6 @@ public class CleanStopLoseClosePositions {
                 traderPositionRepo.save(traderPosition);
             }
         });
-        LOGGER.info("Крона закрытия позиций из БД которые закрылись по стоп лосу завершил работу");
+        LOGGER.info("Крон закрытия позиций из БД которые закрылись по стоп лосу завершил работу");
     }
 }
